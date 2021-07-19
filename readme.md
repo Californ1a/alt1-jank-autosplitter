@@ -2,11 +2,14 @@ Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank, fo
 
 ## Installation
 
-Prereq: Install [Node.js](https://nodejs.org/en/)
+Prereq: Install [Node.js](https://nodejs.org/en/) version 10.24.1
+
+Recommended to use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) (or [nvm-windows](https://github.com/coreybutler/nvm-windows/releases)) instead of directly installing Node.js, so the Node version can be easily switched as-needed.
 
 1. Clone this repo
 2. In the console, within this repo's folder, run `npm i && npm run build`
-   * This will generate a `dist` folder.
+   * This will fail if you are using a newer version of Node (likely >=15).
+   * After it completes, this will generate a `dist` folder.
 3. Using the `index.html` in the `dist` folder, either:
 	 1. Run it in a server (in VSCode, `Ctrl+Shift+P` & `Open with Live Server`) and open in alt1's browser with `alt1://browser/http://127.0.0.1:5500/dist/index.html` or 
 	 2. Directly open the `index.html` in alt1's browser with `alt1://browser/file:///PATH_TO_REPO/dist/index.html`
@@ -23,6 +26,8 @@ Prereq: Install [Node.js](https://nodejs.org/en/)
 Now everything's set up and ready to be run.
 
 ## Usage
+
+Make sure you have timestamps enabled in your in-game chat. The app uses timestamps to make sure it doesn't split twice for the same clue. This can be done in the Settings under *Messages & Social* -> *Chat Customisation* -> *[Local timestamps in chat box](https://i.imgur.com/Tbry2Rp.png)*.
 
 1. Open the alt1 app and click on the word `Click`. Your chatbox should be highlighted and an image will come up in the app (ignore it, this is jank). The app is now watching for clue scroll solve messages.
    * You can minimize the app and leave it running, nothing useful appears in the ui and you can't start/stop it without closing the app and reopening it (jank).

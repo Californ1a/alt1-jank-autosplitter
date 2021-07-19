@@ -84,8 +84,19 @@ export function capture() {
 					for (const line of newlines) {
 						for (const frag of line.fragments) {
 							if (frag.text.match(regex)) {
-								if (!timestamps.includes(line.fragments[0].text)) {
-									timestamps.push(line.fragments[0].text);
+								// console.log("MATCHED -", frag.text);
+
+								const stamps = line.fragments.map(fr=>fr.text).filter(fr=>fr.match(/^\d{2}:\d{2}:\d{2}$/));
+								// console.log("stamps", stamps);
+								// console.log("timestamps", timestamps);
+								
+								const found = timestamps.some(r=> stamps.includes(r));
+								// console.log("found", found);
+								
+								if (!found) {
+									for (const stamp of stamps) {
+										timestamps.push(stamp);
+									}
 									split = true;
 								}
 							}
