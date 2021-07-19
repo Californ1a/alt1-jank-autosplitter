@@ -31,6 +31,7 @@ Make sure you have timestamps enabled in your in-game chat. The app uses timesta
 
 1. Open the alt1 app and click on the word `Click`. Your chatbox should be highlighted and an image will come up in the app (ignore it, this is jank). The app is now watching for clue scroll solve messages.
    * You can minimize the app and leave it running, nothing useful appears in the ui and you can't start/stop it without closing the app and reopening it (jank).
+   * If you used Option 1 from Installation step 3 (VS code Live Server), then you will need to open VS Code and start the server in order to open the app. Option 2 does not require having VS Code or a server running, but does require alt1 to be launched with the `--allow-file-access-from-files` launch option.
 2. Open Livesplit, right-click it, go to `Control`, and hit `Start Server`.
 3. Open the console, browse to the middleman script repo folder, and run `npm start`. It should say `Connected!`
 4. **Manually start your timer**, this thing only auto splits, doesn't auto start.
