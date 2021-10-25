@@ -1,0 +1,16 @@
+{
+	"appName": "jank autosplitter",
+	"description": "write log to file for autosplitter to read",
+	"appUrl": "./index.html",
+	"configUrl": "./appconfig.json",
+	"iconUrl": "",
+	"defaultWidth": 250,
+	"defaultHeight": 250,
+	"minWidth": 250,
+	"minHeight": 180,
+	"maxWidth": 1000,
+	"maxHeight": 1000,
+	"requestHandlers": [],
+	"activators": [],
+	"permissions": "pixel"
+}
