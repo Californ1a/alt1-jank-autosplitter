@@ -2880,16 +2880,6 @@ let defaultbackwardnudges = [
 
 /***/ }),
 
-/***/ "./homebutton.data.png":
-/*!*****************************!*\
-  !*** ./homebutton.data.png ***!
-  \*****************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports=(__webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js").ImageDetect.imageDataFromBase64)("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAAW5vUEUAYtdMlAAAAARub1BFAAAAAEEgjiIAAAAJbm9QRQAAAAAAAAAAAKGKctUAAAGESURBVDhPY4yxzHSqrxaTEnxy9MaNTbu+fnvPgAq4uQQ1/NxkrDVePXu/r7GVcd6OJzx8HPvXbf589BRUCTbAa23mGOT75dMPxi2Xvm7uWfri+lGoDBjwsnAByc9/vkG4ECChae1bEs10fP8piOpvXz8sOzQHiIBsoFKIaogIUArIBioDKmZ6uGIVRDWQhAAgG46gQjAFQMVMQJOQJYDg64/PcAQVAgOgMqBiJrhquPT3nz/QGHApoGJGVy1/CAcoOvPAZggbDaQ7+HJz8ELYTBAKqBpuHiYASsEtYYGz4CDc2AbKYmBYefYIlAVzGNQGoBk/f33/+ukHEEFEIAAiApSC288EdBxENZDz49tvIAIy2Nk4gQhZBKIHqJhJxSsAohoIXv1hASIIGwKQRYDKgIpBaWljbfXtB5cgoniAqoKef3Mrs46pr6Kr8/fr9959eAmVwQaAqs2Li18+fML89uwlZWM7oJ6f3xi+PH/49+8fqBIYAHpGxcbHLCXp68u361uKANkF/40vZkoCAAAAAElFTkSuQmCC")
-
-/***/ }),
-
 /***/ "../node_modules/@alt1/ocr/dist/index.js":
 /*!***********************************************!*\
   !*** ../node_modules/@alt1/ocr/dist/index.js ***!
@@ -4147,6 +4137,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "index.html");
 
+/***/ }),
+
+/***/ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css":
+/*!*****************************************************************************!*\
+  !*** ../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "style.css");
+
 /***/ })
 
 /******/ 	});
@@ -4257,9 +4262,6 @@ var __webpack_exports__ = {};
   !*** ./index.ts ***!
   \******************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "capture": () => (/* binding */ capture)
-/* harmony export */ });
 /* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
 /* harmony import */ var _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alt1/chatbox */ "../node_modules/@alt1/chatbox/dist/index.js");
 //alt1 base libs, provides all the commonly used methods for image matching and capture
@@ -4268,24 +4270,54 @@ __webpack_require__.r(__webpack_exports__);
 
 //tell webpack to add index.html and appconfig.json to output
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./index.html */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./index.html");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./style.css */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css");
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./appconfig.json */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json");
 const output = document.getElementById("output");
-//loads all images as raw pixel data async, images have to be saved as *.data.png
-//this also takes care of metadata headers in the image that make browser load the image
-//with slightly wrong colors
-//this function is async, so you cant acccess the images instantly but generally takes <20ms
-//use `await imgs.promise` if you want to use the images as soon as they are loaded
-const imgs = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.ImageDetect.webpackImages({
-    homeport: __webpack_require__(/*! ./homebutton.data.png */ "./homebutton.data.png")
-});
-//listen for pasted (ctrl-v) images, usually used in the browser version of an app
-_alt1_base__WEBPACK_IMPORTED_MODULE_0__.PasteInput.listen(img => {
-    findHomeport(img);
-}, (err, errid) => {
-    output.insertAdjacentHTML("beforeend", `<div><b>${errid}</b>  ${err}</div>`);
-});
-//You can reach exports on window.TEST because of
-//config.makeUmd("testpackage", "TEST"); in webpack.config.ts
+const startBtn = document.querySelector(".nisbutton.start");
+startBtn.addEventListener("click", capture);
+const clearBtn = document.querySelector(".nisbutton.clear");
+clearBtn.addEventListener("click", clear);
+const timerEle = document.querySelector(".timer");
+const splitsEle = document.querySelector(".splits");
+let chatboxInterval;
+let timerAnim;
+let lastTime = (new Date()).getTime();
+let startTime = 0;
+function clear() {
+    cancelAnimationFrame(timerAnim);
+    startTime = 0;
+    splitsEle.innerHTML = "";
+    timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+}
+function formatTime(value) {
+    const seconds = (value / 1000) % 60;
+    const minutes = Math.floor((value / (60 * 1000)) % 60);
+    const hours = Math.floor((value / (60 * 60 * 1000)) % 24);
+    const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
+    const [sec, mil] = secondsS.split(".");
+    const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
+    const hoursS = (hours < 10) ? `0${hours}`.slice(-2) : `${hours}`.slice(-2);
+    if (hours < 1 && minutes < 1) {
+        return `${sec}.<span class="miliseconds">${mil}</span>`;
+    }
+    if (hours < 1) {
+        return `${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+    }
+    return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+}
+function showTime(value) {
+    timerEle.innerHTML = formatTime(value);
+}
+function timer() {
+    const currentTime = (new Date()).getTime();
+    if (currentTime - lastTime >= 50) {
+        lastTime = currentTime;
+        // numSeconds++;
+        // timerEle.innerHTML = `${numSeconds}`;
+        showTime(currentTime - startTime);
+    }
+    timerAnim = requestAnimationFrame(timer);
+}
 function capture() {
     if (!window.alt1) {
         output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
@@ -4293,6 +4325,14 @@ function capture() {
     }
     if (!alt1.permissionPixel) {
         output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
+        return;
+    }
+    if (startBtn.innerHTML === "Stop") {
+        clearInterval(chatboxInterval);
+        startBtn.innerHTML = "Start";
+        cancelAnimationFrame(timerAnim);
+        startTime = 0;
+        //timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
         return;
     }
     function editFile(fileEntry) {
@@ -4317,9 +4357,9 @@ function capture() {
             catch (_a) { }
         }
         //Find all visible chatboxes on screen
-        reader.find();
-        reader.read();
-        let findChat = setInterval(function () {
+        // reader.find();
+        // reader.read();
+        let findChat = setInterval(() => {
             if (reader.pos === null)
                 reader.find();
             else {
@@ -4335,12 +4375,14 @@ function capture() {
                     reader.pos.mainbox = reader.pos.boxes[0];
                 }
                 showSelectedChat(reader.pos);
-                setInterval(function () {
+                chatboxInterval = setInterval(() => {
                     readChatbox();
-                }, 600);
+                }, 500);
+                startBtn.innerHTML = "Stop";
+                startTime = (new Date()).getTime();
+                requestAnimationFrame(timer);
             }
         }, 1000);
-        //let count, mats, index;
         let timestamps = new Set();
         let actions = 0;
         function readChatbox() {
@@ -4361,6 +4403,9 @@ function capture() {
                     else {
                         timestamps.add(timestamp[0]);
                         console.log("SPLIT!");
+                        const currentTime = (new Date()).getTime();
+                        const time = formatTime(currentTime - startTime);
+                        splitsEle.innerHTML = `${splitsEle.innerHTML}<tr><td>${actions}</td><td>${time}</td></tr>`;
                         fileEntry.createWriter((fileWriter) => {
                             fileWriter.seek(fileWriter.length);
                             const blob = new Blob([`CAL-SPLIT-${actions}\r\n`], { type: "text/plain" });
@@ -4370,24 +4415,7 @@ function capture() {
                     }
                 }
             }
-            // for (let x in comps) {
-            // 	count = Number(comps[x].match(/\d+/)); //1
-            // 	mats = comps[x].match(/[^You receive \d]\w+( \w+)?/)[0]; //Junk
-            // 	if (!mats.match(/parts|components|Junk/)) mats += "s";
-            // 	if (compsList[mats]) {
-            // 		compsList[mats].qty += count; //add count to index of second list.
-            // 		tidyTable(mats);
-            // 	} else {
-            // 		console.warn("Invalid component.  Ignoring.");
-            // 		continue;
-            // 	}
-            // }
         }
-        const img = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.captureHoldFullRs();
-        const loc = img.findSubimage(imgs.homeport);
-        document.write("homeport matches: " + JSON.stringify(loc));
-        const buf = img.toData(0, 500, 450, 300);
-        buf.show();
     }
     function onError(e) {
         console.error(e);
@@ -4400,27 +4428,6 @@ function capture() {
     }
     window.webkitRequestFileSystem(window.TEMPORARY, 1024 * 1024, onInitFs, onError);
 }
-function findHomeport(img) {
-    const loc = img.findSubimage(imgs.homeport);
-    output.insertAdjacentHTML("beforeend", `<div>homeport matches: ${JSON.stringify(loc)}</div>`);
-    //overlay the result on screen if running in alt1
-    if (window.alt1) {
-        if (loc.length != 0) {
-            alt1.overLayRect(_alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(255, 255, 255), loc[0].x, loc[0].y, imgs.homeport.width, imgs.homeport.height, 2000, 3);
-        }
-        else {
-            alt1.overLayTextEx("Couldn't find homeport button", _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(255, 255, 255), 20, Math.round(alt1.rsWidth / 2), 200, 2000, "", true, true);
-        }
-    }
-    //get raw pixels of image and show on screen (used mostly for debug)
-    const buf = img.toData(100, 100, 200, 200);
-    buf.show();
-}
-//print text world
-//also the worst possible example of how to use global exposed exports as described in webpack.config.json
-output.insertAdjacentHTML("beforeend", `
-	<div>paste an image of rs with homeport button (or not)</div>
-	<div onclick='TEST.capture()'>Click to capture if on alt1</div>`);
 //check if we are running inside alt1 by checking if the alt1 global exists
 if (window.alt1) {
     //tell alt1 about the app

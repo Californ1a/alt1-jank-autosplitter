@@ -1,0 +1,35 @@
+* {
+	outline: none;
+}
+
+.ui {
+	width: 100%;
+	margin: 5px 0 10px 0;
+}
+
+.menu th {
+	width: 50%;
+}
+
+.menu button {
+	width: 100%;
+	margin: 5px 0 5px 0;
+}
+
+.nisbutton {
+	border-color: transparent;
+}
+
+.timer {
+	text-align: center;
+	font-size: 1.8em;
+}
+
+.miliseconds {
+	font-size: 0.7em;
+}
+
+.split-head {
+	font-size: 1.1em;
+	text-align: center;
+}
