@@ -1,35 +1,70 @@
 //alt1 base libs, provides all the commonly used methods for image matching and capture
 //also gives your editor info about the window.alt1 api
 import * as a1lib from "@alt1/base";
-import { ImgRef } from "@alt1/base";
 import ChatBoxReader from "@alt1/chatbox";
 
 //tell webpack to add index.html and appconfig.json to output
 require("!file-loader?name=[name].[ext]!./index.html");
+require("!file-loader?name=[name].[ext]!./style.css");
 require("!file-loader?name=[name].[ext]!./appconfig.json");
 
 
 const output = document.getElementById("output");
+const startBtn = document.querySelector(".nisbutton.start");
+startBtn.addEventListener("click", capture);
+const clearBtn = document.querySelector(".nisbutton.clear");
+clearBtn.addEventListener("click", clear);
+const timerEle = document.querySelector(".timer");
+const splitsEle = document.querySelector(".splits");
+let chatboxInterval;
+let timerAnim;
 
-//loads all images as raw pixel data async, images have to be saved as *.data.png
-//this also takes care of metadata headers in the image that make browser load the image
-//with slightly wrong colors
-//this function is async, so you cant acccess the images instantly but generally takes <20ms
-//use `await imgs.promise` if you want to use the images as soon as they are loaded
-const imgs = a1lib.ImageDetect.webpackImages({
-	homeport: require("./homebutton.data.png")
-});
+let lastTime = (new Date()).getTime();
+let startTime = 0;
 
-//listen for pasted (ctrl-v) images, usually used in the browser version of an app
-a1lib.PasteInput.listen(img => {
-	findHomeport(img);
-}, (err, errid) => {
-	output.insertAdjacentHTML("beforeend", `<div><b>${errid}</b>  ${err}</div>`);
-});
+function clear() {
+	cancelAnimationFrame(timerAnim);
+	startTime = 0;
+	splitsEle.innerHTML = "";
+	timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+}
 
-//You can reach exports on window.TEST because of
-//config.makeUmd("testpackage", "TEST"); in webpack.config.ts
-export function capture() {
+function formatTime(value) {
+	const seconds = (value / 1000) % 60;
+	const minutes = Math.floor((value / (60 * 1000)) % 60);
+	const hours = Math.floor((value / (60 * 60 * 1000)) % 24);
+	const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
+	const [sec,mil] = secondsS.split(".");
+	const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
+	const hoursS = (hours < 10) ? `0${hours}`.slice(-2) : `${hours}`.slice(-2);
+
+	if (hours < 1 && minutes < 1) {
+		return `${sec}.<span class="miliseconds">${mil}</span>`;
+	}
+	if (hours < 1) {
+		return `${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+	}
+	return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+}
+
+function showTime(value) {
+	timerEle.innerHTML = formatTime(value);
+}
+
+function timer() {
+	const currentTime = (new Date()).getTime();
+
+	if (currentTime - lastTime >= 50) {
+
+		lastTime = currentTime;
+		// numSeconds++;
+		// timerEle.innerHTML = `${numSeconds}`;
+		showTime(currentTime - startTime);
+	}
+	timerAnim = requestAnimationFrame(timer);
+}
+
+function capture() {
 	if (!window.alt1) {
 		output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
 		return;
@@ -38,6 +73,15 @@ export function capture() {
 		output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
 		return;
 	}
+	if (startBtn.innerHTML === "Stop") {
+		clearInterval(chatboxInterval);
+		startBtn.innerHTML = "Start";
+		cancelAnimationFrame(timerAnim);
+		startTime = 0;
+		//timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+		return;
+	}
+
 
 	function editFile(fileEntry) {
 		const appColor = a1lib.mixColor(0, 255, 0);
@@ -72,9 +116,9 @@ export function capture() {
 		}
 
 		//Find all visible chatboxes on screen
-		reader.find();
-		reader.read();
-		let findChat = setInterval(function () {
+		// reader.find();
+		// reader.read();
+		let findChat = setInterval(() => {
 			if (reader.pos === null)
 				reader.find();
 			else {
@@ -90,13 +134,15 @@ export function capture() {
 					reader.pos.mainbox = reader.pos.boxes[0];
 				}
 				showSelectedChat(reader.pos);
-				setInterval(function () {
+				chatboxInterval = setInterval(() => {
 					readChatbox();
-				}, 600);
+				}, 500);
+				startBtn.innerHTML = "Stop";
+				startTime = (new Date()).getTime();
+				requestAnimationFrame(timer);
 			}
 		}, 1000);
 
-		//let count, mats, index;
 		let timestamps = new Set();
 		let actions = 0;
 
@@ -122,6 +168,9 @@ export function capture() {
 					} else {
 						timestamps.add(timestamp[0]);
 						console.log("SPLIT!");
+						const currentTime = (new Date()).getTime();
+						const time = formatTime(currentTime - startTime);
+						splitsEle.innerHTML = `${splitsEle.innerHTML}<tr><td>${actions}</td><td>${time}</td></tr>`;
 						fileEntry.createWriter((fileWriter) => {
 							fileWriter.seek(fileWriter.length);
 							const blob = new Blob([`CAL-SPLIT-${actions}\r\n`], {type: "text/plain"});
@@ -131,25 +180,7 @@ export function capture() {
 					}
 				}
 			}
-			// for (let x in comps) {
-			// 	count = Number(comps[x].match(/\d+/)); //1
-			// 	mats = comps[x].match(/[^You receive \d]\w+( \w+)?/)[0]; //Junk
-			// 	if (!mats.match(/parts|components|Junk/)) mats += "s";
-			// 	if (compsList[mats]) {
-			// 		compsList[mats].qty += count; //add count to index of second list.
-			// 		tidyTable(mats);
-			// 	} else {
-			// 		console.warn("Invalid component.  Ignoring.");
-			// 		continue;
-			// 	}
-			// }
 		}
-		const img = a1lib.captureHoldFullRs();
-		const loc = img.findSubimage(imgs.homeport);
-		document.write("homeport matches: " + JSON.stringify(loc));
-
-		const buf = img.toData(0, 500, 450, 300);
-		buf.show();
 	}
 
 	function onError(e: Error) {
@@ -166,32 +197,6 @@ export function capture() {
 	(window as any).webkitRequestFileSystem((window as any).TEMPORARY, 1024*1024, onInitFs, onError);
 
 }
-
-function findHomeport(img: ImgRef) {
-	const loc = img.findSubimage(imgs.homeport);
-	output.insertAdjacentHTML("beforeend", `<div>homeport matches: ${JSON.stringify(loc)}</div>`);
-
-	//overlay the result on screen if running in alt1
-	if (window.alt1) {
-		if (loc.length != 0) {
-			alt1.overLayRect(a1lib.mixColor(255, 255, 255), loc[0].x, loc[0].y, imgs.homeport.width, imgs.homeport.height, 2000, 3);
-		} else {
-			alt1.overLayTextEx("Couldn't find homeport button", a1lib.mixColor(255, 255, 255), 20, Math.round(alt1.rsWidth / 2), 200, 2000, "", true, true);
-		}
-	}
-
-	//get raw pixels of image and show on screen (used mostly for debug)
-	const buf = img.toData(100, 100, 200, 200);
-	buf.show();
-}
-
-//print text world
-//also the worst possible example of how to use global exposed exports as described in webpack.config.json
-
-output.insertAdjacentHTML("beforeend", `
-	<div>paste an image of rs with homeport button (or not)</div>
-	<div onclick='TEST.capture()'>Click to capture if on alt1</div>`
-);
 
 //check if we are running inside alt1 by checking if the alt1 global exists
 if (window.alt1) {

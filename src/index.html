@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 <html>
 
-<head></head>
+<head>
+	<link rel="stylesheet" href="https://runeapps.org/nis/nis.css" />
+	<link rel="stylesheet" href="style.css" />
+</head>
 
-<body>
-  <div id="output"></div>
-  <script src="./index.bundle.js"></script>
+<body class="nis">
+	<table class="ui nistable">
+		<thead class="menu">
+			<tr>
+				<th><button class="nisbutton start">Start</button></th>
+				<th><button class="nisbutton clear">Clear</button></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td colspan="2" class="timer">0.<span class="miliseconds">00</span></td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="ui">
+		<thead class="split-head">
+			<tr>
+				<th>#</th>
+				<th>Time</th>
+			</tr>
+		</thead>
+		<tbody class="splits"></tbody>
+	</table>
+	<script src="./index.bundle.js"></script>
 </body>
 
 </html>
