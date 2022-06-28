@@ -2,7 +2,9 @@ Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank, fo
 
 ## Installation
 
-### You can skip steps #1-3 and start at step #4 by using [this hosted version](https://californ1a.github.io/alt1-jank-autosplitter/) of the app (click [here](alt1://addapp/https://californ1a.github.io/alt1-jank-autosplitter/appconfig.json) to add to alt1), rather than installing it locally.
+### You can skip steps #1-3 and start at step #4 by using [this hosted version](https://californ1a.github.io/alt1-jank-autosplitter/) of the app, rather than installing it locally. Copy/paste this full link to add to alt1:
+
+alt1://addapp/https://californ1a.github.io/alt1-jank-autosplitter/appconfig.json
 
 Prereq: Install [Node.js](https://nodejs.org/en/) version 16.6.1
 
