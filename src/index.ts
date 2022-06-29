@@ -36,7 +36,7 @@ function formatTime(value) {
 	const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
 	const [sec,mil] = secondsS.split(".");
 	const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
-	const hoursS = (hours < 10) ? `0${hours}`.slice(-2) : `${hours}`.slice(-2);
+	const hoursS = `${hours}`.slice(-2);
 
 	if (hours < 1 && minutes < 1) {
 		return `${sec}.<span class="miliseconds">${mil}</span>`;
@@ -144,7 +144,7 @@ function capture() {
 		}, 1000);
 
 		let timestamps = new Set();
-		let actions = 0;
+		let actions = 1;
 
 		function readChatbox() {
 			const opts = reader.read() || [];
