@@ -7,28 +7,34 @@
 </head>
 
 <body class="nis">
-	<table class="ui nistable">
-		<thead class="menu">
-			<tr>
-				<th><button class="nisbutton start">Start</button></th>
-				<th><button class="nisbutton clear">Clear</button></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td colspan="2" class="timer">0.<span class="miliseconds">00</span></td>
-			</tr>
-		</tbody>
-	</table>
-	<table class="ui">
-		<thead class="split-head">
-			<tr>
-				<th>#</th>
-				<th>Time</th>
-			</tr>
-		</thead>
-		<tbody class="splits"></tbody>
-	</table>
+	<div class="main">
+		<table class="ui nistable">
+			<thead class="menu">
+				<tr>
+					<th><button class="nisbutton start">Start</button></th>
+					<th><button class="nisbutton clear">Clear</button></th>
+					<!-- <th><button class="nisbutton test">Test</button></th> -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="2" class="timer">0.<span class="miliseconds">00</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="second">
+		<table class="ui">
+			<thead class="splits-head">
+				<tr>
+					<th>#</th>
+					<th>Segment</th>
+					<th>Time</th>
+				</tr>
+			</thead>
+			<tbody class="splits"></tbody>
+		</table>
+	</div>
 	<script src="./index.bundle.js"></script>
 </body>
 

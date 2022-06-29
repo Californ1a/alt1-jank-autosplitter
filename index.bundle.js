@@ -4272,15 +4272,17 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./index.html */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./index.html");
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./style.css */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css");
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./appconfig.json */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json");
-const output = document.getElementById("output");
+// const output = document.querySelector(".main");
 const startBtn = document.querySelector(".nisbutton.start");
 startBtn.addEventListener("click", capture);
 const clearBtn = document.querySelector(".nisbutton.clear");
 clearBtn.addEventListener("click", clear);
 const timerEle = document.querySelector(".timer");
 const splitsEle = document.querySelector(".splits");
+const scrollBox = document.querySelector(".second");
 let chatboxInterval;
 let timerAnim;
+const splits = [];
 let lastTime = (new Date()).getTime();
 let startTime = 0;
 function clear() {
@@ -4296,14 +4298,14 @@ function formatTime(value) {
     const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
     const [sec, mil] = secondsS.split(".");
     const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
-    const hoursS = (hours < 10) ? `0${hours}`.slice(-2) : `${hours}`.slice(-2);
+    const hoursS = `${hours}`.slice(-2);
     if (hours < 1 && minutes < 1) {
-        return `${sec}.<span class="miliseconds">${mil}</span>`;
+        return `${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
     }
     if (hours < 1) {
-        return `${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+        return `${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
     }
-    return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${mil}</span>`;
+    return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
 }
 function showTime(value) {
     timerEle.innerHTML = formatTime(value);
@@ -4318,13 +4320,33 @@ function timer() {
     }
     timerAnim = requestAnimationFrame(timer);
 }
+function split(actions, fileEntry, onError) {
+    if (fileEntry && onError) {
+        fileEntry.createWriter((fileWriter) => {
+            fileWriter.seek(fileWriter.length);
+            const blob = new Blob([`CAL-SPLIT-${actions}\r\n`], { type: "text/plain" });
+            fileWriter.write(blob);
+        }, onError);
+    }
+    const currentTime = (new Date()).getTime();
+    const previous = splits[splits.length - 1];
+    splits.push(currentTime - startTime);
+    const current = splits[splits.length - 1];
+    const time = formatTime(currentTime - startTime);
+    const segmentTime = (previous) ? formatTime(current - previous) : time;
+    splitsEle.innerHTML += `<tr><td>${actions}</td><td>${segmentTime}</td><td>${time}</td></tr>`;
+    scrollBox.scrollTo({
+        top: scrollBox.scrollHeight,
+        behavior: "smooth"
+    });
+}
 function capture() {
     if (!window.alt1) {
-        output.insertAdjacentHTML("beforeend", `<div>You need to run this page in alt1 to capture the screen</div>`);
+        timerEle.innerHTML = "<small>You need to run this page in alt1 to capture the screen</small>";
         return;
     }
     if (!alt1.permissionPixel) {
-        output.insertAdjacentHTML("beforeend", `<div>Page is not installed as app or capture permission is not enabled</div>`);
+        timerEle.innerHTML = "<small>Page is not installed as app or capture permission is not enabled</small>";
         return;
     }
     if (startBtn.innerHTML === "Stop") {
@@ -4340,15 +4362,22 @@ function capture() {
         let reader = new _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__["default"]();
         reader.readargs = {
             colors: [
-                //a1lib.mixColor(255, 255, 255), //white
+                _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(255, 255, 255),
                 _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(0, 255, 0), //green
                 //A1lib.mixColor(255, 165, 0), //Scavenging comps
                 //A1lib.mixColor(255, 0, 0), //Rare Mats
                 //A1lib.mixColor(67, 188, 188), //Ancient components
             ],
         };
-        reader.find(); //Find the chat box.
-        reader.read(); //Get the initial read, to not report on initial load.
+        try {
+            reader.find(); //Find the chat box.
+            reader.read(); //Get the initial read, to not report on initial load.
+        }
+        catch (e) {
+            console.error(e);
+            timerEle.innerHTML = "<small>Failed to capture RS window</small>";
+            return;
+        }
         function showSelectedChat(chat) {
             //Attempt to show a temporary rectangle around the chatbox.  skip if overlay is not enabled.
             try {
@@ -4384,15 +4413,15 @@ function capture() {
             }
         }, 1000);
         let timestamps = new Set();
-        let actions = 0;
+        let actions = 1;
         function readChatbox() {
             const opts = reader.read() || [];
             let chat = "";
             for (let a in opts) {
                 chat += opts[a].text + " ";
             }
-            console.log(chat);
-            const clueComplete = chat.match(/\[\d{2}:\d{2}:\d{2}\] Your reward was stored in Charos/g);
+            //console.log(chat);
+            const clueComplete = chat.match(/\[\d{2}:\d{2}:\d{2}\] Your (reward was stored in Charos|Charos Clue Carrier has placed)/g);
             if (clueComplete != null && clueComplete.length > -1) {
                 console.log(clueComplete);
                 const timestamp = clueComplete[0].match(/\d{2}:\d{2}:\d{2}/g);
@@ -4403,15 +4432,8 @@ function capture() {
                     else {
                         timestamps.add(timestamp[0]);
                         console.log("SPLIT!");
-                        const currentTime = (new Date()).getTime();
-                        const time = formatTime(currentTime - startTime);
-                        splitsEle.innerHTML = `${splitsEle.innerHTML}<tr><td>${actions}</td><td>${time}</td></tr>`;
-                        fileEntry.createWriter((fileWriter) => {
-                            fileWriter.seek(fileWriter.length);
-                            const blob = new Blob([`CAL-SPLIT-${actions}\r\n`], { type: "text/plain" });
-                            fileWriter.write(blob);
-                            actions++;
-                        }, onError);
+                        split(actions, fileEntry, onError);
+                        actions++;
                     }
                 }
             }
@@ -4434,6 +4456,20 @@ if (window.alt1) {
     //this makes alt1 show the add app button when running inside the embedded browser
     //also updates app settings if they are changed
     alt1.identifyAppUrl("./appconfig.json");
+}
+const testBtn = document.querySelector(".nisbutton.test");
+if (testBtn) {
+    testBtn.addEventListener("click", test);
+}
+let testAct = 1;
+function test() {
+    if (!startTime) {
+        startTime = (new Date()).getTime();
+        requestAnimationFrame(timer);
+        return;
+    }
+    split(testAct);
+    testAct++;
 }
 
 })();
