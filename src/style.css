@@ -33,6 +33,13 @@ body {
 	font-size: 1.8em;
 }
 
+.timer small {
+	font-size: 0.6em;
+	color: lightcoral;
+	font-weight: bold;
+	text-shadow: 0 0 0.5em grey;
+}
+
 .miliseconds {
 	font-size: 0.7em;
 }
@@ -59,4 +66,12 @@ body {
 .second {
 	height: calc(100vh - 92px);
 	overflow-y: scroll;
+}
+
+.splits-head th:first-child {
+	width: 11vw;
+}
+
+.splits-head th:nth-child(2) {
+	width: 35vw;
 }
