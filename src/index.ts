@@ -20,7 +20,7 @@ const scrollBox = document.querySelector(".second");
 let chatboxInterval;
 let timerAnim;
 
-const splits = [];
+let splits = [];
 let lastTime = (new Date()).getTime();
 let startTime = 0;
 
@@ -29,6 +29,7 @@ function clear() {
 	startTime = 0;
 	splitsEle.innerHTML = "";
 	timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+	splits = [];
 }
 
 function formatTime(value) {

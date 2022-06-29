@@ -31,13 +31,19 @@ body {
 .timer {
 	text-align: center;
 	font-size: 1.8em;
+	font-family: century-gothic, sans-serif;
+	font-weight: bold;
+	font-style: normal;
 }
 
 .timer small {
 	font-size: 0.6em;
 	color: lightcoral;
-	font-weight: bold;
-	text-shadow: 0 0 0.5em grey;
+	font-family: sans-serif;
+	text-shadow: 0 0 0.5em #666;
+	vertical-align: middle;
+	position: relative;
+	top: -1px;
 }
 
 .miliseconds {
@@ -51,6 +57,19 @@ body {
 
 .splits td {
 	text-align: center;
+	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+	font-weight: 600;
+	font-size: 1.12em;
+}
+
+.splits tr td:first-child {
+	font-family: sans-serif;
+	font-weight: 400;
+	font-size: 0.85em;
+}
+
+.splits tr:nth-child(odd) {
+	background-color: rgba(37, 48, 58, 0.78);
 }
 
 .splits-head th {
@@ -59,13 +78,13 @@ body {
 	padding-bottom: 8px;
 	padding-top: 6px;
 	/*background-image: url(https://runeapps.org/nis/alt1-currentskin/background.png);*/
-	background-color: rgba(23, 30, 36, 0.8);
+	background-color: rgba(23, 30, 36, 0.78);
 	backdrop-filter: blur(0.07em);
 }
 
 .second {
 	height: calc(100vh - 92px);
-	overflow-y: scroll;
+	overflow-y: overlay;
 }
 
 .splits-head th:first-child {
