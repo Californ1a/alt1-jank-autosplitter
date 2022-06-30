@@ -12,7 +12,7 @@ Recommended to use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) 
 
 1. Clone this repo
 2. In the console, within this repo's folder, run `npm i && npm run build`
-   * This will fail if you are using a newer version of Node (likely >=15).
+   * You may also need to manually install sharp and canvas `npm i sharp canvas` and then run `npm run build` again.
    * After it completes, this will generate a `dist` folder.
 3. Using the `index.html` in the `dist` folder, either:
 	 1. Run it in a server (in VSCode, `Ctrl+Shift+P` & `Open with Live Server`) and open in alt1's browser with `alt1://browser/http://127.0.0.1:5500/dist/index.html` or 
