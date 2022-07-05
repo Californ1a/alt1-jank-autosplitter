@@ -80,9 +80,11 @@ function split(actions, fileEntry?, onError?) {
 	splits.push(currentTime-startTime);
 	const current = splits[splits.length - 1];
 	const msDuration = currentTime - startTime;
-	const [cluesHr, chrMs] = `${((60 * 60 * 1000)/msDuration).toFixed(2)}`.split(".");
+	const [cluesHr, chrMs] = `${((actions/msDuration) * (60 * 60 * 1000)).toFixed(2)}`.split("."); // clues/hr using total time avg
 	const time = formatTime(msDuration);
-	const segmentTime = (previous)?formatTime(current - previous):time;
+	const segMsDur = current - previous;
+	// const [cluesHr, chrMs] = `${((1/segMsDur) * (60 * 60 * 1000)).toFixed(2)}`.split("."); // clues/hr using segment time
+	const segmentTime = (previous)?formatTime(segMsDur):time;
 	splitsEle.innerHTML += `<tr>
 		<td>${actions}</td>
 		<td>${segmentTime}</td>
