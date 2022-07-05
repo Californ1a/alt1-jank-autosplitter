@@ -80,6 +80,7 @@ body {
 	/*background-image: url(https://runeapps.org/nis/alt1-currentskin/background.png);*/
 	background-color: rgba(23, 30, 36, 0.78);
 	backdrop-filter: blur(0.07em);
+	font-size: 0.945em;
 }
 
 .second {
@@ -88,9 +89,20 @@ body {
 }
 
 .splits-head th:first-child {
-	width: 11vw;
+	/* width: 11vw; */
+	min-width: 15px;
 }
 
 .splits-head th:nth-child(2) {
-	width: 35vw;
+	/* width: 35vw; */
+	min-width: 65px;
+	max-width: 65px;
+}
+
+.splits-head th:nth-child(3) {
+	min-width: 65px;
+}
+
+.splits-head th:nth-child(4) {
+	padding-right: 12px;
 }
