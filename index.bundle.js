@@ -4446,6 +4446,9 @@ function capture() {
                 }
             }
         }
+        fileEntry.createWriter((fileWriter) => {
+            fileWriter.truncate(0);
+        }, onError);
     }
     function onError(e) {
         console.error(e);
