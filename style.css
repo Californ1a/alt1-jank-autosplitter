@@ -60,6 +60,7 @@ body {
 	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
 	font-weight: 600;
 	font-size: 1.12em;
+	padding: 3px;
 }
 
 .splits tr td:first-child {
@@ -76,7 +77,7 @@ body {
 	position: sticky;
 	top: 0;
 	padding-bottom: 8px;
-	padding-top: 6px;
+	padding-top: 8px;
 	/*background-image: url(https://runeapps.org/nis/alt1-currentskin/background.png);*/
 	background-color: rgba(23, 30, 36, 0.78);
 	backdrop-filter: blur(0.07em);
@@ -86,6 +87,10 @@ body {
 .second {
 	height: calc(100vh - 92px);
 	overflow-y: overlay;
+}
+
+.second .ui {
+	border-spacing: 0px;
 }
 
 .splits-head th:first-child {
