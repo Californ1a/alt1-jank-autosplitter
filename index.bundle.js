@@ -4333,9 +4333,11 @@ function split(actions, fileEntry, onError) {
     const previous = splits[splits.length - 1];
     splits.push(currentTime - startTime);
     const current = splits[splits.length - 1];
-    const time = formatTime(currentTime - startTime);
+    const msDuration = currentTime - startTime;
+    const cluesHr = ((60 * 60 * 1000) / msDuration).toFixed(1);
+    const time = formatTime(msDuration);
     const segmentTime = (previous) ? formatTime(current - previous) : time;
-    splitsEle.innerHTML += `<tr><td>${actions}</td><td>${segmentTime}</td><td>${time}</td></tr>`;
+    splitsEle.innerHTML += `<tr><td>${actions}</td><td>${segmentTime}</td><td>${time}</td><td>${cluesHr}</td></tr>`;
     scrollBox.scrollTo({
         top: scrollBox.scrollHeight,
         behavior: "smooth"
