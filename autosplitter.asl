@@ -45,6 +45,9 @@ update
 		if (line.Contains("SPLIT")) {
 			vars.command = "SPLIT";
 			return true;
+		} else if (line.Contains("START")) {
+			vars.command = "START";
+			return true;
 		} else if (line.Contains("RESET")) {
 			vars.command = "RESET";
 			return true;

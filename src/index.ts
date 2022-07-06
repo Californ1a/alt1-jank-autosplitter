@@ -11,7 +11,7 @@ require("!file-loader?name=[name].[ext]!./appconfig.json");
 
 // const output = document.querySelector(".main");
 const startBtn = document.querySelector(".nisbutton.start");
-startBtn.addEventListener("click", capture);
+startBtn.addEventListener("click", startTimer);
 const clearBtn = document.querySelector(".nisbutton.clear");
 clearBtn.addEventListener("click", clear);
 const timerEle = document.querySelector(".timer");
@@ -35,13 +35,7 @@ function clear() {
 	splitsEle.innerHTML = "";
 	timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
 	splits = [];
-	if (file) {
-		file.createWriter((fileWriter) => {
-			fileWriter.seek(fileWriter.length);
-			const blob = new Blob(["RESET\r\n"], {type: "text/plain"});
-			fileWriter.write(blob);
-		}, onError);
-	}
+	writeLine("RESET");
 }
 
 function formatTime(value) {
@@ -80,13 +74,7 @@ function timer() {
 }
 
 function split(actions) {
-	if (file) {
-		file.createWriter((fileWriter) => {
-			fileWriter.seek(fileWriter.length);
-			const blob = new Blob([`CAL-SPLIT-${actions}\r\n`], {type: "text/plain"});
-			fileWriter.write(blob);
-		}, onError);
-	}
+	writeLine(`SPLIT-${actions}`);
 	const currentTime = (new Date()).getTime();
 	const previous = splits[splits.length - 1];
 	splits.push(currentTime-startTime);
@@ -109,6 +97,31 @@ function split(actions) {
 	});
 }
 
+function writeLine(line) {
+	if (file) {
+		file.createWriter((fileWriter) => {
+			fileWriter.seek(fileWriter.length);
+			const blob = new Blob([`${line}\r\n`], {type: "text/plain"});
+			fileWriter.write(blob);
+		}, onError);
+	}
+}
+
+function startTimer() {
+	if (startTime !== 0) {
+		clearInterval(chatboxInterval);
+		startBtn.innerHTML = "Start";
+		cancelAnimationFrame(timerAnim);
+		startTime = 0;
+		//timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+		return;
+	}
+	writeLine("START");
+	startBtn.innerHTML = "Stop";
+	startTime = (new Date()).getTime();
+	requestAnimationFrame(timer);
+}
+
 function capture() {
 	if (!window.alt1) {
 		timerEle.innerHTML = "<small>You need to run this page in alt1 to capture the screen</small>";
@@ -116,14 +129,6 @@ function capture() {
 	}
 	if (!alt1.permissionPixel) {
 		timerEle.innerHTML = "<small>Page is not installed as app or capture permission is not enabled</small>";
-		return;
-	}
-	if (startBtn.innerHTML === "Stop") {
-		clearInterval(chatboxInterval);
-		startBtn.innerHTML = "Start";
-		cancelAnimationFrame(timerAnim);
-		startTime = 0;
-		//timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
 		return;
 	}
 
@@ -161,7 +166,9 @@ function capture() {
 				2000,
 				5
 			);
-		} catch { }
+		} catch (e) {
+			console.error(e);
+		 }
 	}
 
 	//Find all visible chatboxes on screen
@@ -175,7 +182,7 @@ function capture() {
 			// reader.pos.boxes.map((box, i) => {
 			// 	$(".chat").append(`<option value=${i}>Chat ${i}</option>`);
 			// });
-
+			// TODO: Add a dropdown to select which chat to read.
 			if (localStorage.ccChat) {
 				reader.pos.mainbox = reader.pos.boxes[localStorage.ccChat];
 			} else {
@@ -186,9 +193,6 @@ function capture() {
 			chatboxInterval = setInterval(() => {
 				readChatbox();
 			}, 500);
-			startBtn.innerHTML = "Stop";
-			startTime = (new Date()).getTime();
-			requestAnimationFrame(timer);
 		}
 	}, 1000);
 
@@ -208,10 +212,11 @@ function capture() {
 		const clueComplete = chat.match(
 			/\[\d{2}:\d{2}:\d{2}\] Your (reward was stored in Charos|Charos Clue Carrier has placed)/g
 		);
+		// TODO: Auto-stop Alt1 in-app timer if got reward but clue carrier didn't place new clue (last clue finished)
 		if (clueComplete != null && clueComplete.length > -1) {
 			console.log(clueComplete);
 			const timestamp = clueComplete[0].match(/\d{2}:\d{2}:\d{2}/g);
-			if (timestamp != null && timestamp.length > -1) {
+			if (startTime !== 0 && timestamp != null && timestamp.length > -1) {
 				if (timestamps.has(timestamp[0])) {
 					console.log("Duplicate timestamp");
 				} else {
@@ -254,6 +259,18 @@ if (window.alt1) {
 	if (!alt1.permissionPixel) {
 		timerEle.innerHTML = "<small>Page is not installed as app or capture permission is not enabled</small>";
 	}
+	
+	document.addEventListener("readystatechange", () => {
+		if (document.readyState === "complete") {
+			capture();
+		}
+ }, false);
+
+	a1lib.on("alt1pressed", (e) => {
+		if (e.text.match(/^Open Sealed clue scroll/) && startTime === 0) {
+			startTimer();
+		}
+	});
 }
 
 if (document.location.host !== "californ1a.github.io") {
