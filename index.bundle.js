@@ -4392,12 +4392,12 @@ window.addEventListener("click", (event) => {
     }
 });
 errorEle.addEventListener("mouseenter", () => {
-    if (!alt1)
+    if (!window.alt1)
         return;
     alt1.setTooltip(errorEle.ariaLabel);
 });
 errorEle.addEventListener("mouseleave", () => {
-    if (!alt1)
+    if (!window.alt1)
         return;
     alt1.clearTooltip();
 });
