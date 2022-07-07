@@ -4109,6 +4109,21 @@ eval("module.exports = {\"chars\":[{\"width\":13,\"bonus\":455,\"chr\":\"a\",\"p
 
 /***/ }),
 
+/***/ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./Icon.png":
+/*!****************************************************************************!*\
+  !*** ../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./Icon.png ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "Icon.png");
+
+/***/ }),
+
 /***/ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json":
 /*!**********************************************************************************!*\
   !*** ../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json ***!
@@ -4288,6 +4303,7 @@ __webpack_require__(/*! !file-loader?name=[name].[ext]!./index.html */ "../node_
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./style.css */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css");
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./appconfig.json */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json");
 __webpack_require__(/*! !file-loader?name=[name].[ext]!./settingsbutton2.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./settingsbutton2.png");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./Icon.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./Icon.png");
 // const output = document.querySelector(".main");
 const startBtn = document.querySelector(".nisbutton.start");
 startBtn.addEventListener("click", startTimer);
