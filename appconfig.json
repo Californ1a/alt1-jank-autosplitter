@@ -1,6 +1,6 @@
 {
-	"appName": "jank autosplitter",
-	"description": "write log to file for autosplitter to read",
+	"appName": "Jank Autosplitter",
+	"description": "Track split times with LiveSplit integration.",
 	"appUrl": "./index.html",
 	"configUrl": "./appconfig.json",
 	"iconUrl": "",

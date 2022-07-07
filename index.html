@@ -9,16 +9,23 @@
 
 <body class="nis">
 	<div class="main">
-		<table class="ui nistable">
+		<table class="ui nistable head">
 			<thead class="menu">
 				<tr>
 					<th><button class="nisbutton start">Start</button></th>
 					<th><button class="nisbutton clear">Clear</button></th>
 				</tr>
 			</thead>
+		</table>
+		<table class="ui nistable body">
 			<tbody>
 				<tr>
-					<td colspan="2" class="timer">0.<span class="miliseconds">00</span></td>
+					<td class="timer">
+						<div class="time">0.<span class="miliseconds">00</span></div><span class="error">!</span>
+					</td>
+					<td>
+						<div class="nissmallimagebutton menubutton settings"></div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -35,6 +42,74 @@
 			</thead>
 			<tbody class="splits"></tbody>
 		</table>
+	</div>
+	<div id="settingsModal" class="modal">
+		<div class="modal-content nisborder">
+			<div class="nisclosebutton"></div>
+			<div class="modal-content-inner">
+				<!-- <span class="close">&times;</span> -->
+				<h3>Settings</h3>
+				<div class="settingstable">
+					<table class="ui nistable">
+						<tbody>
+							<tr title="Main timer display total time or segment time">
+								<td>
+									<label for="timer-type">Timer Type</label>
+								</td>
+								<td>
+									<select id="timer-type" class="nisdropdown">
+										<option value="overall">Overall</option>
+										<option value="single">Single</option>
+									</select>
+								</td>
+							</tr>
+							<tr title="Which chatbox to watch for clue solve messages, if multiple are detected">
+								<td>
+									<label for="chat">Chatbox</label>
+								</td>
+								<td>
+									<select id="chat" class="nisdropdown">
+										<option value>Select</option>
+									</select>
+								</td>
+							</tr>
+							<tr title="Enable logging to a file for LiveSplit integration (check link at bottom for LS setup)">
+								<td>
+									<label for="livesplit">LiveSplit Integration</label>
+								</td>
+								<td>
+									<input id="livesplit" class="nisinput" type="checkbox" checked />
+								</td>
+							</tr>
+							<tr title="The regex for what chat messages to split on (timestamps automatically included)">
+								<td>
+									<label for="regex">Regex</label>
+								</td>
+								<td>
+									<textarea id="regex" value class="nisinput" spellcheck="false" rows="6"></textarea>
+								</td>
+							</tr>
+							<tr title="Secondary color of the chat line to search for (white always scanned)">
+								<td>
+									<label for="color">Chat Color</label>
+								</td>
+								<td>
+									<input id="color" type="color" value="#00ff00" />
+								</td>
+							</tr>
+					</table>
+					<div class="setting-buttons">
+						<div class="nisbutton2 default" title="Reset settings to default">Reset to default</div>
+						<!-- <div class="nisbutton2 save">Save</div> -->
+					</div>
+					<div class="extra-links">
+						<a href="https://github.com/Californ1a" target="_blank">GitHub</a><span class="dot"> • </span>
+						<a href="https://github.com/Californ1a/alt1-jank-autosplitter" target="_blank">LiveSplit Setup</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 	<script src="./index.bundle.js"></script>
 </body>
