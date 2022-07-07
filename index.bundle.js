@@ -4416,12 +4416,12 @@ window.addEventListener("click", (event) => {
     }
 });
 errorEle.addEventListener("mouseenter", () => {
-    if (!window.alt1)
+    if (!errorEle.title)
         return;
     alt1.setTooltip(errorEle.ariaLabel);
 });
 errorEle.addEventListener("mouseleave", () => {
-    if (!window.alt1)
+    if (!errorEle.title)
         return;
     alt1.clearTooltip();
 });
@@ -4485,6 +4485,7 @@ function openSettings() {
     }
 }
 function setError(message) {
+    var _a, _b;
     if (!errorEle) {
         errorEle = document.createElement("span");
         errorEle.className = "error";
@@ -4492,7 +4493,7 @@ function setError(message) {
     }
     errorEle.style.display = "block";
     errorEle.ariaLabel = message;
-    if (!window.alt1) {
+    if (!window.alt1 || !((_a = window.alt1) === null || _a === void 0 ? void 0 : _a.permissionPixel) || !((_b = window.alt1) === null || _b === void 0 ? void 0 : _b.permissionOverlay)) {
         errorEle.title = message;
     }
 }
