@@ -165,6 +165,9 @@ function setError(message) {
 	}
 	errorEle.style.display = "block";
 	errorEle.ariaLabel = message;
+	if (!window.alt1) {
+		errorEle.title = message;
+	}
 }
 
 function onError(e: Error) {
