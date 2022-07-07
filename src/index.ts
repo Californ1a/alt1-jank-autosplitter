@@ -169,7 +169,7 @@ function openSettings() {
 	}
 
 	const autostopEle: HTMLInputElement = document.querySelector("#autostop");
-	const autostop = localStorage.getItem("clueshr-type");
+	const autostop = localStorage.getItem("autostop");
 	if (autostop === null || autostop === "") {
 		autostopEle.value = "50";
 	} else {
