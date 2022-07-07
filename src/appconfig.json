@@ -3,7 +3,7 @@
 	"description": "Track split times with LiveSplit integration.",
 	"appUrl": "./index.html",
 	"configUrl": "./appconfig.json",
-	"iconUrl": "",
+	"iconUrl": "./Icon.png",
 	"defaultWidth": 250,
 	"defaultHeight": 250,
 	"minWidth": 250,

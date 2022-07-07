@@ -8,6 +8,7 @@ require("!file-loader?name=[name].[ext]!./index.html");
 require("!file-loader?name=[name].[ext]!./style.css");
 require("!file-loader?name=[name].[ext]!./appconfig.json");
 require("!file-loader?name=[name].[ext]!./settingsbutton2.png");
+require("!file-loader?name=[name].[ext]!./Icon.png");
 
 
 // const output = document.querySelector(".main");
