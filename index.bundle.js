@@ -4392,10 +4392,14 @@ window.addEventListener("click", (event) => {
     }
 });
 errorEle.addEventListener("mouseenter", () => {
-    alt1 === null || alt1 === void 0 ? void 0 : alt1.setTooltip(errorEle.ariaLabel);
+    if (!alt1)
+        return;
+    alt1.setTooltip(errorEle.ariaLabel);
 });
 errorEle.addEventListener("mouseleave", () => {
-    alt1 === null || alt1 === void 0 ? void 0 : alt1.clearTooltip();
+    if (!alt1)
+        return;
+    alt1.clearTooltip();
 });
 document.querySelector("#chat").addEventListener("change", (e) => {
     const value = e.target.value || localStorage.getItem("chat");
