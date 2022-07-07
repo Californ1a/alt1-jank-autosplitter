@@ -118,12 +118,12 @@ window.addEventListener("click", (event) => {
 });
 
 errorEle.addEventListener("mouseenter", () => {
-	if (!errorEle.title) return;
+	if (errorEle.title) return;
 	alt1.setTooltip(errorEle.ariaLabel);
 });
 
 errorEle.addEventListener("mouseleave", () => {
-	if (!errorEle.title) return;
+	if (errorEle.title) return;
 	alt1.clearTooltip();
 });
 
