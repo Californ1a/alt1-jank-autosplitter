@@ -4341,7 +4341,9 @@ function closeSettings() {
         }
         else if (setting.id === "color") {
             const c = hexToRgb(setting.value);
-            reader.readargs.colors[reader.readargs.colors.length - 1] = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]);
+            if (reader) {
+                reader.readargs.colors[reader.readargs.colors.length - 1] = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]);
+            }
         }
         if (setting.type === "checkbox") {
             localStorage.setItem(setting.id, setting.checked);
@@ -4362,8 +4364,10 @@ defaultButton.addEventListener("click", () => {
         }
         else if (setting.id === "chat") {
             setting.value = "";
-            reader.pos.mainbox = reader.pos.boxes[0];
-            showSelectedChat(reader.pos.mainbox);
+            if (reader) {
+                reader.pos.mainbox = reader.pos.boxes[0];
+                showSelectedChat(reader.pos.mainbox);
+            }
         }
         else if (setting.id === "livesplit") {
             setting.checked = true;
@@ -4388,10 +4392,10 @@ window.addEventListener("click", (event) => {
     }
 });
 errorEle.addEventListener("mouseenter", () => {
-    alt1.setTooltip(errorEle.ariaLabel);
+    alt1 === null || alt1 === void 0 ? void 0 : alt1.setTooltip(errorEle.ariaLabel);
 });
 errorEle.addEventListener("mouseleave", () => {
-    alt1.clearTooltip();
+    alt1 === null || alt1 === void 0 ? void 0 : alt1.clearTooltip();
 });
 document.querySelector("#chat").addEventListener("change", (e) => {
     const value = e.target.value || localStorage.getItem("chat");
