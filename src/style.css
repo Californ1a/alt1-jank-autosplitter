@@ -1,5 +1,6 @@
 * {
 	outline: none;
+	box-sizing: border-box;
 }
 
 body {
@@ -18,6 +19,12 @@ body {
 .menu th {
 	width: 50%;
 }
+
+/* .menu th:nth-child(2) {
+	width: unset;
+	min-width: 35px;
+	max-width: 35px;
+} */
 
 .menu button {
 	width: 100%;
@@ -110,4 +117,177 @@ body {
 
 .splits-head th:nth-child(4) {
 	padding-right: 12px;
+}
+
+.settings {
+	margin: auto;
+	background-image: url("./settingsbutton2.png");
+	margin-top: 4px;
+}
+
+.nistable.body {
+	margin-top: 0;
+	border-top: none;
+}
+
+.nistable.head {
+	border-bottom: none;
+	-webkit-border-vertical-spacing: unset;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgb(0, 0, 0);
+	background-color: rgba(0, 0, 0, 0.4);
+	flex: 1;
+}
+
+.modal-content {
+	background-image: url(https://runeapps.org/nis/alt1-currentskin/background.png);
+	background-color: rgb(23, 30, 36);
+	margin: 9vh 5vw;
+	width: 100%;
+	overflow-y: overlay;
+	padding-right: 10px;
+}
+
+.modal-content h3 {
+	margin: 10px 5px;
+	padding: 5px 10px;
+	position: sticky;
+	top: 0;
+	background-color: rgba(4, 18, 27, 0.75);
+	backdrop-filter: blur(0.15em);
+	z-index: 1;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+	width: calc(100% - 2vw);
+}
+
+.modal-content textarea {
+	resize: vertical;
+	height: auto;
+}
+
+.modal-content td:first-child {
+	min-width: 60px;
+	font-weight: bold;
+	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.modal-content td:nth-child(2) {
+	text-align: center;
+	padding-top: 3px;
+}
+
+.modal-content tr:hover {
+	background-color: #435565b0;
+}
+
+.settingstable {
+	margin: 5px 10px;
+	margin-bottom: 10px;
+}
+
+.nisclosebutton {
+	float: right;
+	position: sticky;
+	top: 0;
+	right: -7px;
+	background-size: 100%;
+	height: 15px;
+	width: 15px;
+	z-index: 2;
+}
+
+.nisclosebutton:hover {
+	background-position: 0px -15px;
+}
+
+.menu th:nth-child(3) {
+	max-width: 34px;
+}
+
+.body td:nth-child(2) {
+	width: 34px;
+}
+
+.error {
+	display: none;
+	width: 20px;
+	height: 20px;
+	background: #ff0000cc;
+	background-blend-mode: darken;
+	border-radius: 50%;
+	color: #eee;
+	font-size: 15px;
+	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+	font-weight: 800;
+	cursor: help;
+	user-select: none;
+	position: absolute;
+	top: 58px;
+	right: 45px;
+}
+
+.error:hover {
+	background: #ff0000ee;
+	color: white;
+}
+
+.nisinput,
+.nisdropdown {
+	color: #ddd;
+}
+
+.setting-buttons {
+	margin-top: 5px;
+	display: flex;
+	flex: 1;
+	gap: 10px;
+	margin-bottom: 7px;
+}
+
+.setting-buttons .nisbutton2 {
+	flex: 1;
+}
+
+.nisinput[type="checkbox"] {
+	cursor: pointer;
+}
+
+#color {
+	background-color: rgba(23, 30, 36, 0.78);
+	border: 0;
+}
+
+.extra-links {
+	display: flex;
+	flex: 1;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	justify-content: space-evenly;
+	padding: 5px;
+	margin: auto;
+	max-width: 400px;
+}
+
+.extra-links a {
+	color: goldenrod;
+}
+
+.extra-links .dot {
+	font-size: 1.1em;
+	font-weight: bold;
 }
