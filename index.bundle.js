@@ -4416,12 +4416,12 @@ window.addEventListener("click", (event) => {
     }
 });
 errorEle.addEventListener("mouseenter", () => {
-    if (!errorEle.title)
+    if (errorEle.title)
         return;
     alt1.setTooltip(errorEle.ariaLabel);
 });
 errorEle.addEventListener("mouseleave", () => {
-    if (!errorEle.title)
+    if (errorEle.title)
         return;
     alt1.clearTooltip();
 });
