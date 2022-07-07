@@ -35,7 +35,7 @@ The original implementation of this app used a Node.js middleman script (found o
 
 To use the middleman script:
 
-1. Install [Node.js](https://nodejs.org/en/) (preferrably using [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) or [nvm-windows](https://github.com/coreybutler/nvm-windows/releases)) rather than a direct install).
+1. Install [Node.js](https://nodejs.org/en/) (preferrably using [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) or [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) rather than a direct install).
 1. Download [Livesplit Server](https://github.com/LiveSplit/LiveSplit.Server/releases) zip, and unzip it into the `Components` folder of your Livesplit install directory.
 2. Start Livesplit, right-click, edit layout, click the + button and add the Livesplit Server component (under the `Control` section).
 3. Clone the middleman script repo [@Californ1a/jank-autosplitter](https://github.com/Californ1a/jank-autosplitter)
