@@ -198,6 +198,17 @@ function setError(message) {
 	}
 }
 
+function clearError() {
+	if (!errorEle) return;
+	errorEle.style.display = "none";
+	errorEle.ariaLabel = "";
+	if (!window.alt1) {
+		errorEle.title = "";
+	} else {
+		alt1.clearTooltip();
+	}
+}
+
 function onError(e: Error) {
 	console.error(e);
 }
@@ -361,18 +372,17 @@ function capture() {
 		setError("Failed to capture RS");
 		return;
 	}
-	if (!reader.pos) {
-		setError("Failed to find chat box");
-		return;
-	}
 	//Find all visible chatboxes on screen
 	// reader.find();
 	// reader.read();
 	let findChat = setInterval(() => {
-		if (reader.pos === null)
+		if (reader.pos === null) {
+			setError("Looking for chatbox");
 			reader.find();
+		}
 		else {
 			clearInterval(findChat);
+			clearError();
 			reader.pos.boxes.map((box, i) => {
 				const chat = document.querySelector("#chat");
 				const value = btoa(JSON.stringify(box));
