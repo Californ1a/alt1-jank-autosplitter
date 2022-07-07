@@ -118,12 +118,12 @@ window.addEventListener("click", (event) => {
 });
 
 errorEle.addEventListener("mouseenter", () => {
-	if (!window.alt1) return;
+	if (!errorEle.title) return;
 	alt1.setTooltip(errorEle.ariaLabel);
 });
 
 errorEle.addEventListener("mouseleave", () => {
-	if (!window.alt1) return;
+	if (!errorEle.title) return;
 	alt1.clearTooltip();
 });
 
@@ -194,7 +194,7 @@ function setError(message) {
 	}
 	errorEle.style.display = "block";
 	errorEle.ariaLabel = message;
-	if (!window.alt1) {
+	if (!window.alt1 || !window.alt1?.permissionPixel || !window.alt1?.permissionOverlay) {
 		errorEle.title = message;
 	}
 }
