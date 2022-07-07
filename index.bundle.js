@@ -4377,6 +4377,10 @@ defaultButton.addEventListener("click", () => {
             setting.value = "overall";
             localStorage.setItem("timer-type", "overall");
         }
+        else if (setting.id === "clueshr-type") {
+            setting.value = "overall";
+            localStorage.setItem("clueshr-type", "overall");
+        }
         else if (setting.id === "color") {
             setting.value = "#00ff00";
             localStorage.setItem("color", "#00ff00");
@@ -4434,6 +4438,14 @@ function openSettings() {
     }
     else {
         timerTypeEle.value = tt;
+    }
+    const clueshrTypeEle = document.querySelector("#clueshr-type");
+    const chr = localStorage.getItem("clueshr-type");
+    if (chr === null || chr === "") {
+        clueshrTypeEle.value = "overall";
+    }
+    else {
+        clueshrTypeEle.value = tt;
     }
     const colorEle = document.querySelector("#color");
     const c = localStorage.getItem("color");
@@ -4510,10 +4522,11 @@ function split() {
     const previous = splits[splits.length - 1] || startTime;
     splits.push(currentTime);
     const msDuration = currentTime - startTime;
-    const [cluesHr, chrMs] = `${((actions / msDuration) * (60 * 60 * 1000)).toFixed(2)}`.split("."); // clues/hr using total time avg
     const time = formatTime(msDuration);
     const segMsDur = currentTime - previous;
-    // const [cluesHr, chrMs] = `${((1/segMsDur) * (60 * 60 * 1000)).toFixed(2)}`.split("."); // clues/hr using segment time
+    const clueshrType = localStorage.getItem("clueshr-type") || "overall";
+    const actionsPerTime = (clueshrType === "single") ? 1 / segMsDur : actions / msDuration;
+    const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
     const segmentTime = (previous) ? formatTime(segMsDur) : time;
     splitsEle.innerHTML += `<tr>
 		<td>${actions}</td>
