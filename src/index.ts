@@ -43,7 +43,7 @@ function closeSettings() {
 		// console.log(setting.id, setting.value);
 		if (setting.id === "regex") {
 			regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
-		} else if (setting.id === "chat") {
+		} else if (setting.id === "chat" && reader) {
 			const chat = setting.value;
 			const ls = localStorage.getItem("chat");
 			if (chat !== null && chat !== "") {
@@ -323,7 +323,10 @@ function capture() {
 		setError("Failed to capture RS");
 		return;
 	}
-
+	if (!reader.pos) {
+		setError("Failed to find chat box");
+		return;
+	}
 	//Find all visible chatboxes on screen
 	// reader.find();
 	// reader.read();
@@ -416,21 +419,6 @@ if (window.alt1) {
 	if (!alt1.permissionPixel) {
 		setError("Page is not installed as app or capture permission is not enabled");
 	}
-	
-	document.addEventListener("readystatechange", () => {
-		if (document.readyState === "complete") {
-			const ls = localStorage.getItem("livesplit");
-			if (ls === "" || ls === null) {
-				localStorage.setItem("livesplit", "true");
-			}
-			const color = localStorage.getItem("color");
-			if (color === "" || color === null) {
-				localStorage.setItem("color", "#00ff00");
-			}
-
-			capture();
-		}
- }, false);
 
 	a1lib.on("alt1pressed", (e) => {
 		if (e.text.match(/^Open Sealed clue scroll/) && startTime === 0) {
@@ -438,6 +426,21 @@ if (window.alt1) {
 		}
 	});
 }
+
+document.addEventListener("readystatechange", () => {
+	if (document.readyState === "complete") {
+		const ls = localStorage.getItem("livesplit");
+		if (ls === "" || ls === null) {
+			localStorage.setItem("livesplit", "true");
+		}
+		const color = localStorage.getItem("color");
+		if (color === "" || color === null) {
+			localStorage.setItem("color", "#00ff00");
+		}
+
+		capture();
+	}
+}, false);
 
 if (document.location.host !== "californ1a.github.io") {
 	const th = document.createElement("th");
