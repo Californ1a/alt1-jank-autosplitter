@@ -44,7 +44,7 @@ function closeSettings() {
 		// console.log(setting.id, setting.value);
 		if (setting.id === "regex") {
 			regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
-		} else if (setting.id === "chat" && reader) {
+		} else if (setting.id === "chat" && reader && reader.pos) {
 			const chat = setting.value;
 			const ls = localStorage.getItem("chat");
 			if (chat !== null && chat !== "") {
@@ -65,6 +65,21 @@ function closeSettings() {
 			if (reader) {
 				reader.readargs.colors[reader.readargs.colors.length-1] = a1lib.mixColor(c[0], c[1], c[2]);
 			}
+		} else if (setting.id === "clueshr-type") {
+			const ls = localStorage.getItem("clueshr-type");
+			if (ls !== null && ls !== "" && setting.value !== ls && splitsEle.children) {
+				const rows = splitsEle.children;
+				for (let i = 0; i < rows.length; i++) {
+					const clueshrTd = rows[i].children[3];
+					
+					const msDuration = splits[i] - startTime;
+					const segMsDur = (i === 0) ? splits[i] - startTime : splits[i] - splits[i-1];
+					const actionsPerTime = (setting.value === "single") ? 1/segMsDur : actions/msDuration;
+					const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
+
+					clueshrTd.innerHTML = `${cluesHr}.<span class="miliseconds">${(chrMs)?chrMs:"00"}</span>`;
+				}
+			}
 		}
 		if (setting.type === "checkbox") {
 			localStorage.setItem(setting.id, setting.checked);
@@ -84,7 +99,7 @@ defaultButton.addEventListener("click", () => {
 			regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
 		} else if (setting.id === "chat") {
 			setting.value = "";
-			if (reader) {
+			if (reader && reader.pos) {
 				reader.pos.mainbox = reader.pos.boxes[0];
 				showSelectedChat(reader.pos.mainbox);
 			}
