@@ -4381,6 +4381,10 @@ defaultButton.addEventListener("click", () => {
             setting.value = "overall";
             localStorage.setItem("clueshr-type", "overall");
         }
+        else if (setting.id === "autostop") {
+            setting.value = "50";
+            localStorage.setItem("autostop", "50");
+        }
         else if (setting.id === "color") {
             setting.value = "#00ff00";
             localStorage.setItem("color", "#00ff00");
@@ -4445,7 +4449,15 @@ function openSettings() {
         clueshrTypeEle.value = "overall";
     }
     else {
-        clueshrTypeEle.value = tt;
+        clueshrTypeEle.value = chr;
+    }
+    const autostopEle = document.querySelector("#autostop");
+    const autostop = localStorage.getItem("clueshr-type");
+    if (autostop === null || autostop === "") {
+        autostopEle.value = "50";
+    }
+    else {
+        autostopEle.value = autostop;
     }
     const colorEle = document.querySelector("#color");
     const c = localStorage.getItem("color");
@@ -4538,6 +4550,12 @@ function split() {
         top: scrollBox.scrollHeight,
         behavior: "smooth"
     });
+    const as = localStorage.getItem("autostop");
+    if (as !== "" || as !== null) {
+        if (as !== "0" && as === actions.toString()) {
+            startTimer();
+        }
+    }
 }
 function writeLine(line) {
     if (file && localStorage.getItem("livesplit") === "true") {
@@ -4709,6 +4727,10 @@ document.addEventListener("readystatechange", () => {
         const color = localStorage.getItem("color");
         if (color === "" || color === null) {
             localStorage.setItem("color", "#00ff00");
+        }
+        const autostop = localStorage.getItem("autostop");
+        if (autostop === "" || autostop === null) {
+            localStorage.setItem("autostop", "50");
         }
         capture();
     }
