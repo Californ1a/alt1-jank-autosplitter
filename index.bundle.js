@@ -4292,6 +4292,9 @@ var __webpack_exports__ = {};
   !*** ./index.ts ***!
   \******************/
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "addTestButton": () => (/* binding */ addTestButton)
+/* harmony export */ });
 /* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
 /* harmony import */ var _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alt1/chatbox */ "../node_modules/@alt1/chatbox/dist/index.js");
 //alt1 base libs, provides all the commonly used methods for image matching and capture
@@ -4607,6 +4610,7 @@ function startTimer() {
         //timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
         return;
     }
+    clear();
     writeLine("START");
     startBtn.innerHTML = "Stop";
     startTime = (new Date()).getTime();
@@ -4775,20 +4779,22 @@ document.addEventListener("readystatechange", () => {
         capture();
     }
 }, false);
-if (document.location.host !== "californ1a.github.io") {
+function addTestButton() {
+    const testBtn = document.querySelector(".test");
+    if (testBtn) {
+        return console.log("Test button already exists");
+    }
     const th = document.createElement("th");
     th.innerHTML = "<div class=\"nisbutton2 test\">Test</div>";
     document.querySelector(".menu tr").appendChild(th);
+    th.children[0].addEventListener("click", test);
 }
-const testBtn = document.querySelector(".test");
-if (testBtn) {
-    testBtn.addEventListener("click", test);
+if (document.location.host !== "californ1a.github.io") {
+    addTestButton();
 }
 function test() {
     if (!startTime) {
-        actions = 1;
-        startTime = (new Date()).getTime();
-        requestAnimationFrame(timer);
+        startTimer();
         return;
     }
     split();
