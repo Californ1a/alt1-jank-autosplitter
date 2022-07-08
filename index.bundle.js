@@ -4733,7 +4733,9 @@ function onInitFs(fs) {
         fs.root.getFile("info.txt", { create: true }, setFile, onError);
     });
 }
-window.webkitRequestFileSystem(window.TEMPORARY, 1024 * 1024, onInitFs, onError);
+if (localStorage.getItem("livesplit") !== "false") {
+    window.webkitRequestFileSystem(window.TEMPORARY, 1024 * 1024, onInitFs, onError);
+}
 function hexToRgb(hex) {
     return hex.match(/[A-Za-z0-9]{2}/g).map((v) => parseInt(v, 16));
 }
