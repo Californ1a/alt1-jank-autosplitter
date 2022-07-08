@@ -4336,7 +4336,7 @@ function closeSettings() {
         if (setting.id === "regex") {
             regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
         }
-        else if (setting.id === "chat" && reader) {
+        else if (setting.id === "chat" && reader && reader.pos) {
             const chat = setting.value;
             const ls = localStorage.getItem("chat");
             if (chat !== null && chat !== "") {
@@ -4361,6 +4361,21 @@ function closeSettings() {
                 reader.readargs.colors[reader.readargs.colors.length - 1] = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]);
             }
         }
+        else if (setting.id === "clueshr-type") {
+            const ls = localStorage.getItem("clueshr-type");
+            if (ls !== null && ls !== "" && setting.value !== ls && splitsEle.children) {
+                const rows = splitsEle.children;
+                for (let i = 0; i < rows.length; i++) {
+                    const clueshrTd = rows[i].children[3];
+                    const msDuration = splits[i] - startTime;
+                    const segMsDur = (i === 0) ? splits[i] - startTime : splits[i] - splits[i - 1];
+                    const splitper = localStorage.getItem("splitat") || "1";
+                    const actionsPerTime = (setting.value === "single") ? (+splitper) / segMsDur : actions / msDuration;
+                    const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
+                    clueshrTd.innerHTML = `${cluesHr}.<span class="miliseconds">${(chrMs) ? chrMs : "00"}</span>`;
+                }
+            }
+        }
         if (setting.type === "checkbox") {
             localStorage.setItem(setting.id, setting.checked);
         }
@@ -4380,7 +4395,7 @@ defaultButton.addEventListener("click", () => {
         }
         else if (setting.id === "chat") {
             setting.value = "";
-            if (reader) {
+            if (reader && reader.pos) {
                 reader.pos.mainbox = reader.pos.boxes[0];
                 showSelectedChat(reader.pos.mainbox);
             }
@@ -4400,6 +4415,10 @@ defaultButton.addEventListener("click", () => {
         else if (setting.id === "autostop") {
             setting.value = "50";
             localStorage.setItem("autostop", "50");
+        }
+        else if (setting.id === "splitat") {
+            setting.value = "1";
+            localStorage.setItem("splitat", "1");
         }
         else if (setting.id === "color") {
             setting.value = "#00ff00";
@@ -4434,6 +4453,16 @@ document.querySelector("#chat").addEventListener("change", (e) => {
         showSelectedChat(reader.pos.mainbox);
     }
 });
+function setValue(id, value) {
+    const setting = document.querySelector(`#${id}`);
+    const ls = localStorage.getItem(id);
+    if (ls === null || ls === "") {
+        setting.value = value;
+    }
+    else {
+        setting.value = ls;
+    }
+}
 function openSettings() {
     modal.style.display = "flex";
     const regexEle = document.querySelector("textarea#regex");
@@ -4451,38 +4480,11 @@ function openSettings() {
     else {
         livesplitEle.checked = true;
     }
-    const timerTypeEle = document.querySelector("#timer-type");
-    const tt = localStorage.getItem("timer-type");
-    if (tt === null || tt === "") {
-        timerTypeEle.value = "overall";
-    }
-    else {
-        timerTypeEle.value = tt;
-    }
-    const clueshrTypeEle = document.querySelector("#clueshr-type");
-    const chr = localStorage.getItem("clueshr-type");
-    if (chr === null || chr === "") {
-        clueshrTypeEle.value = "overall";
-    }
-    else {
-        clueshrTypeEle.value = chr;
-    }
-    const autostopEle = document.querySelector("#autostop");
-    const autostop = localStorage.getItem("autostop");
-    if (autostop === null || autostop === "") {
-        autostopEle.value = "50";
-    }
-    else {
-        autostopEle.value = autostop;
-    }
-    const colorEle = document.querySelector("#color");
-    const c = localStorage.getItem("color");
-    if (c === null || c === "") {
-        colorEle.value = "#00ff00";
-    }
-    else {
-        colorEle.value = c;
-    }
+    setValue("timer-type", "overall");
+    setValue("clueshr-type", "overall");
+    setValue("autostop", "50");
+    setValue("splitat", "1");
+    setValue("color", "#00ff00");
 }
 function setError(message) {
     var _a, _b;
@@ -4566,7 +4568,8 @@ function split() {
     const time = formatTime(msDuration);
     const segMsDur = currentTime - previous;
     const clueshrType = localStorage.getItem("clueshr-type") || "overall";
-    const actionsPerTime = (clueshrType === "single") ? 1 / segMsDur : actions / msDuration;
+    const splitper = localStorage.getItem("splitat") || "1";
+    const actionsPerTime = (clueshrType === "single") ? (+splitper) / segMsDur : actions / msDuration;
     const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
     const segmentTime = (previous) ? formatTime(segMsDur) : time;
     splitsEle.innerHTML += `<tr>
@@ -4703,9 +4706,12 @@ function capture() {
                     console.log("Duplicate timestamp");
                 }
                 else {
-                    timestamps.add(timestamp[0]);
-                    console.log("SPLIT!");
-                    split();
+                    const ls = localStorage.getItem("splitat") || "1";
+                    if (actions % parseInt(ls, 10) === 0) {
+                        timestamps.add(timestamp[0]);
+                        console.log("SPLIT!");
+                        split();
+                    }
                     actions++;
                 }
             }
@@ -4759,6 +4765,10 @@ document.addEventListener("readystatechange", () => {
         const autostop = localStorage.getItem("autostop");
         if (autostop === "" || autostop === null) {
             localStorage.setItem("autostop", "50");
+        }
+        const splitat = localStorage.getItem("splitat");
+        if (splitat === "" || splitat === null) {
+            localStorage.setItem("splitat", "1");
         }
         capture();
     }
