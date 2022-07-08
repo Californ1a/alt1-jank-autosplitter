@@ -74,7 +74,8 @@ function closeSettings() {
 					
 					const msDuration = splits[i] - startTime;
 					const segMsDur = (i === 0) ? splits[i] - startTime : splits[i] - splits[i-1];
-					const actionsPerTime = (setting.value === "single") ? 1/segMsDur : actions/msDuration;
+					const splitper = localStorage.getItem("splitat") || "1";
+					const actionsPerTime = (setting.value === "single") ? (+splitper)/segMsDur : actions/msDuration;
 					const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
 
 					clueshrTd.innerHTML = `${cluesHr}.<span class="miliseconds">${(chrMs)?chrMs:"00"}</span>`;
@@ -115,6 +116,9 @@ defaultButton.addEventListener("click", () => {
 		} else if (setting.id === "autostop") {
 			setting.value = "50";
 			localStorage.setItem("autostop", "50");
+		} else if (setting.id === "splitat") {
+			setting.value = "1";
+			localStorage.setItem("splitat", "1");
 		} else if (setting.id === "color") {
 			setting.value = "#00ff00";
 			localStorage.setItem("color", "#00ff00");
@@ -151,6 +155,16 @@ document.querySelector("#chat").addEventListener("change", (e: any) => {
 	}
 });
 
+function setValue(id: string, value: string) {
+	const setting: HTMLInputElement = document.querySelector(`#${id}`);
+	const ls = localStorage.getItem(id);
+	if (ls === null || ls === "") {
+		setting.value = value;
+	} else {
+		setting.value = ls;
+	}
+}
+
 function openSettings() {
 	modal.style.display = "flex";
 	const regexEle: HTMLInputElement = document.querySelector("textarea#regex");
@@ -168,37 +182,12 @@ function openSettings() {
 		livesplitEle.checked = true;
 	}
 
-	const timerTypeEle: HTMLInputElement = document.querySelector("#timer-type");
-	const tt = localStorage.getItem("timer-type");
-	if (tt === null || tt === "") {
-		timerTypeEle.value = "overall";
-	} else {
-		timerTypeEle.value = tt;
-	}
+	setValue("timer-type", "overall");
+	setValue("clueshr-type", "overall");
+	setValue("autostop", "50");
+	setValue("splitat", "1");
+	setValue("color", "#00ff00");
 
-	const clueshrTypeEle: HTMLInputElement = document.querySelector("#clueshr-type");
-	const chr = localStorage.getItem("clueshr-type");
-	if (chr === null || chr === "") {
-		clueshrTypeEle.value = "overall";
-	} else {
-		clueshrTypeEle.value = chr;
-	}
-
-	const autostopEle: HTMLInputElement = document.querySelector("#autostop");
-	const autostop = localStorage.getItem("autostop");
-	if (autostop === null || autostop === "") {
-		autostopEle.value = "50";
-	} else {
-		autostopEle.value = autostop;
-	}
-
-	const colorEle: HTMLInputElement = document.querySelector("#color");
-	const c = localStorage.getItem("color");
-	if (c === null || c === "") {
-		colorEle.value = "#00ff00";
-	} else {
-		colorEle.value = c;
-	}
 }
 
 function setError(message) {
@@ -289,7 +278,8 @@ function split() {
 	const time = formatTime(msDuration);
 	const segMsDur = currentTime - previous;
 	const clueshrType = localStorage.getItem("clueshr-type") || "overall";
-	const actionsPerTime = (clueshrType === "single") ? 1/segMsDur : actions/msDuration;
+	const splitper = localStorage.getItem("splitat") || "1";
+	const actionsPerTime = (clueshrType === "single") ? (+splitper)/segMsDur : actions/msDuration;
 	const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
 	const segmentTime = (previous)?formatTime(segMsDur):time;
 	splitsEle.innerHTML += `<tr>
@@ -440,9 +430,12 @@ function capture() {
 				if (timestamps.has(timestamp[0])) {
 					console.log("Duplicate timestamp");
 				} else {
-					timestamps.add(timestamp[0]);
-					console.log("SPLIT!");
-					split();
+					const ls = localStorage.getItem("splitat") || "1";
+					if (actions % parseInt(ls, 10) === 0) {
+						timestamps.add(timestamp[0]);
+						console.log("SPLIT!");
+						split();
+					}
 					actions++;
 				}
 			}
@@ -504,6 +497,10 @@ document.addEventListener("readystatechange", () => {
 		const autostop = localStorage.getItem("autostop");
 		if (autostop === "" || autostop === null) {
 			localStorage.setItem("autostop", "50");
+		}
+		const splitat = localStorage.getItem("splitat");
+		if (splitat === "" || splitat === null) {
+			localStorage.setItem("splitat", "1");
 		}
 
 		capture();
