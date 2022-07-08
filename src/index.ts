@@ -319,6 +319,7 @@ function startTimer() {
 		//timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
 		return;
 	}
+	clear();
 	writeLine("START");
 	startBtn.innerHTML = "Stop";
 	startTime = (new Date()).getTime();
@@ -509,22 +510,25 @@ document.addEventListener("readystatechange", () => {
 	}
 }, false);
 
-if (document.location.host !== "californ1a.github.io") {
+export function addTestButton() {
+	const testBtn = document.querySelector(".test");
+	if (testBtn) {
+		return console.log("Test button already exists");
+	}
 	const th = document.createElement("th");
 	th.innerHTML = "<div class=\"nisbutton2 test\">Test</div>";
 	document.querySelector(".menu tr").appendChild(th);
+	th.children[0].addEventListener("click", test);
 }
 
-const testBtn = document.querySelector(".test");
-if (testBtn) {
-	testBtn.addEventListener("click", test);
+
+if (document.location.host !== "californ1a.github.io") {
+	addTestButton();
 }
 
 function test() {
 	if (!startTime) {
-		actions = 1;
-		startTime = (new Date()).getTime();
-		requestAnimationFrame(timer);
+		startTimer();
 		return;
 	}
 	split();
