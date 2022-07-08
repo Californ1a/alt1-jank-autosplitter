@@ -1,6 +1,13 @@
-Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank. Originally created for LiveSplit integration. Alt1 app UI added later on so it can be used independently without LS.
+<div align="center">
+<h1>Jank Autosplitter</h1>
 
-![](https://i.imgur.com/uVsNIg5.png)
+<p>
+	<img src="https://i.imgur.com/SDw2wzP.png"/>
+</p>
+
+Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank. Originally created for LiveSplit integration with Alt1 app UI added later on for independent usage without LS.
+
+</div>
 
 ## User Installation
 
@@ -47,7 +54,7 @@ To use the middleman script:
 
 Upon opening the app, your chatbox should be highlighted to show that it is now watching for clue scroll solve messages.
 
-Make sure you have timestamps enabled in your in-game chat. The app uses timestamps to make sure it doesn't split twice for the same clue. This can be done in the Settings under *Messages & Social* -> *Chat Customisation* -> *[Local timestamps in chat box](https://i.imgur.com/Tbry2Rp.png)*.
+Make sure you have timestamps enabled in your in-game chat. The app uses timestamps to make sure it doesn't split twice for the same clue. This can be done in the Settings under *Chat & Social* -> *Chat Customisation* -> *[Local timestamps in chat box](https://i.imgur.com/Tbry2Rp.png)*.
 
 You can minimize the app and leave it running if you want to just use LiveSplit, or run just the app on its own without LiveSplit if you want.
 
