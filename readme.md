@@ -17,7 +17,7 @@ To add to alt1, copy paste this full address:
 
     alt1://addapp/https://californ1a.github.io/alt1-jank-autosplitter/appconfig.json
 
-Then hit the `Add App` button and open the newly added app (you might have to hit the wrench in the top right of the app and give it additional permissions).
+Then hit the `Add App` button and open the newly added app.
 
 ### LiveSplit Integration
 
