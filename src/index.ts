@@ -34,9 +34,11 @@ let timerAnim;
 let splits = [];
 let lastTime = (new Date()).getTime();
 let startTime = 0;
+let startDate = new Date();
 let file;
 let actions = 1;
 let reader;
+let clueType = "";
 
 function closeSettings() {
 	const settingsElements: any = document.querySelectorAll(".modal-content td:nth-child(even)");
@@ -222,6 +224,7 @@ function clear() {
 	startBtn.innerHTML = "Start";
 	cancelAnimationFrame(timerAnim);
 	startTime = 0;
+	startDate = new Date();
 	actions = 1;
 	splitsEle.innerHTML = "";
 	timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
@@ -322,7 +325,8 @@ function startTimer() {
 	clear();
 	writeLine("START");
 	startBtn.innerHTML = "Stop";
-	startTime = (new Date()).getTime();
+	startDate = new Date();
+	startTime = startDate.getTime();
 	requestAnimationFrame(timer);
 }
 
@@ -416,31 +420,53 @@ function capture() {
 		const opts = reader.read() || [];
 		let chat = "";
 
+		if (opts.length === 0) return;
+
+		// console.log(opts);
+
 		for (let a in opts) {
 			chat += opts[a].text + " ";
 		}
 
-		//console.log(chat);
+		if (chat.trim().match(/^\[\d{2}:\d{2}:\d{2}\]$/g)) return;
+
+		// console.log(chat);
+		const clueType2 = chat.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
+		if (clueType2?.groups?.type && clueType2.groups.type !== clueType) {
+			clueType = clueType2.groups.type;
+		}
 
 		const clueComplete = chat.match(regex);
 		// TODO: Auto-stop Alt1 in-app timer if got reward but clue carrier didn't place new clue (last clue finished)
-		if (clueComplete != null && clueComplete.length > -1) {
-			console.log(clueComplete);
-			const timestamp = clueComplete[0].match(/\d{2}:\d{2}:\d{2}/g);
-			if (startTime !== 0 && timestamp != null && timestamp.length > -1) {
-				if (timestamps.has(timestamp[0])) {
-					console.log("Duplicate timestamp");
-				} else {
-					const ls = localStorage.getItem("splitat") || "1";
-					if (actions % parseInt(ls, 10) === 0) {
-						timestamps.add(timestamp[0]);
-						console.log("SPLIT!");
-						split();
-					}
-					actions++;
-				}
-			}
+		if (!(clueComplete != null && clueComplete.length > -1)) return;
+
+		console.log(clueComplete);
+		const timestamp = clueComplete[0].match(/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})/);
+		if (!(startTime !== 0 && timestamp != null && timestamp.length > -1)) return;
+
+		if (timestamps.has(timestamp[0])) {
+			return console.log("Duplicate timestamp");
 		}
+
+		const time = new Date(
+			startDate.getFullYear(),
+			startDate.getMonth(),
+			startDate.getDate(),
+			+timestamp.groups.hour,
+			+timestamp.groups.minute,
+			+timestamp.groups.second
+		);
+		if (time.getTime() < startTime) {
+			return console.log("Clue too early");
+		}
+
+		const ls = localStorage.getItem("splitat") || "1";
+		if (actions % parseInt(ls, 10) === 0) {
+			timestamps.add(timestamp[0]);
+			console.log("SPLIT!");
+			split();
+		}
+		actions++;
 	}
 }
 
@@ -481,7 +507,10 @@ if (window.alt1) {
 	}
 
 	a1lib.on("alt1pressed", (e) => {
-		if (e.text.match(/^Open Sealed clue scroll/) && startTime === 0) {
+		const clue = e.text.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
+		if (clue?.groups?.type) {
+			clueType = clue.groups.type;
+			clear();
 			startTimer();
 		}
 	});
