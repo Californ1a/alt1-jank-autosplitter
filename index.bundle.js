@@ -4182,6 +4182,684 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "style.css");
 
+/***/ }),
+
+/***/ "./index.ts":
+/*!******************!*\
+  !*** ./index.ts ***!
+  \******************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "split": () => (/* binding */ split),
+/* harmony export */   "reader": () => (/* binding */ reader)
+/* harmony export */ });
+/* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
+/* harmony import */ var _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alt1/chatbox */ "../node_modules/@alt1/chatbox/dist/index.js");
+/* harmony import */ var _scripts_Splits__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./scripts/Splits */ "./scripts/Splits.ts");
+/* harmony import */ var _scripts_Settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./scripts/Settings */ "./scripts/Settings.ts");
+/* harmony import */ var _scripts_FileUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./scripts/FileUtil */ "./scripts/FileUtil.ts");
+/* harmony import */ var _scripts_TimerUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./scripts/TimerUtil */ "./scripts/TimerUtil.ts");
+/* harmony import */ var _scripts_Chat__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./scripts/Chat */ "./scripts/Chat.ts");
+/* harmony import */ var _scripts_TestBtn__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./scripts/TestBtn */ "./scripts/TestBtn.ts");
+//alt1 base libs, provides all the commonly used methods for image matching and capture
+//also gives your editor info about the window.alt1 api
+
+
+
+
+
+
+
+
+//tell webpack to add other files to output
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./index.html */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./index.html");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./style.css */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./appconfig.json */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./settingsbutton2.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./settingsbutton2.png");
+__webpack_require__(/*! !file-loader?name=[name].[ext]!./Icon.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./Icon.png");
+const startBtn = document.querySelector(".nisbutton.start");
+const clearBtn = document.querySelector(".nisbutton.clear");
+const settingsBtn = document.querySelector(".nissmallimagebutton.settings");
+const modal = document.getElementById("settingsModal");
+const modalCloseBtn = document.getElementsByClassName("nisclosebutton")[0];
+const settingEles = document.querySelectorAll(".modal-content td:nth-child(even)");
+const defaultBtn = document.querySelector(".default");
+const timerEle = document.querySelector(".timer .time");
+const splitsEle = document.querySelector(".splits");
+const scrollBox = document.querySelector(".second");
+const chatDropdown = document.querySelector("#chat");
+let errorEle = document.querySelector(".error");
+const split = new _scripts_Splits__WEBPACK_IMPORTED_MODULE_2__.Splits(startBtn, clearBtn, splitsEle, timerEle, scrollBox);
+const settings = new _scripts_Settings__WEBPACK_IMPORTED_MODULE_3__.Settings(settingEles, settingsBtn, defaultBtn, chatDropdown, modal);
+const a1Error = new _scripts_TimerUtil__WEBPACK_IMPORTED_MODULE_5__.A1Error(errorEle, timerEle);
+let reader;
+modalCloseBtn.addEventListener("click", () => {
+    settings.close(split);
+});
+window.addEventListener("click", (event) => {
+    if (event.target != modal)
+        return;
+    settings.close(split);
+});
+errorEle.addEventListener("mouseenter", () => {
+    if (errorEle.title)
+        return;
+    alt1.setTooltip(errorEle.ariaLabel);
+});
+errorEle.addEventListener("mouseleave", () => {
+    if (errorEle.title)
+        return;
+    alt1.clearTooltip();
+});
+function capture() {
+    if (!window.alt1) {
+        a1Error.setError("You need to run this page in alt1 to capture the screen");
+        return;
+    }
+    if (!alt1.permissionPixel) {
+        a1Error.setError("Page is not installed as app or capture permission is not enabled");
+        return;
+    }
+    reader = new _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    let c = settings.settings.color;
+    if (c) {
+        c = (0,_scripts_Chat__WEBPACK_IMPORTED_MODULE_6__.hexToRgb)(c);
+    }
+    else {
+        c = [0, 255, 0];
+    }
+    reader.readargs = {
+        colors: [
+            _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(255, 255, 255),
+            _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]), // green
+        ],
+    };
+    // Find all visible chatboxes on screen
+    try {
+        reader.find(); // Find the chat box.
+        reader.read(); // Get the initial read, to not report on initial load.
+    }
+    catch (e) {
+        console.error(e);
+        a1Error.setError("Failed to capture RS");
+        return;
+    }
+    let findChat = setInterval(() => {
+        if (reader.pos === null) {
+            a1Error.setError("Looking for chatbox");
+            reader.find();
+        }
+        else {
+            clearInterval(findChat);
+            a1Error.clearError();
+            reader.pos.boxes.map((box, i) => {
+                const chat = document.querySelector("#chat");
+                chat.innerHTML += `<option value=${i}>Chat ${i}</option>`;
+            });
+            const chat = parseInt(settings.settings.chat, 10);
+            if (reader.pos.boxes[chat]) {
+                reader.pos.mainbox = reader.pos.boxes[chat];
+            }
+            else {
+                //If multiple boxes are found, this will select the first, which should be the top-most chat box on the screen.
+                reader.pos.mainbox = reader.pos.boxes[0];
+            }
+            // console.log(reader);
+            (0,_scripts_Chat__WEBPACK_IMPORTED_MODULE_6__.showSelectedChat)(reader.pos.mainbox);
+            split.setcbInterval(setInterval(() => {
+                readChatbox();
+            }, 500));
+        }
+    }, 1000);
+    // let timestamps = new Set();
+    function readChatbox() {
+        var _a;
+        const opts = reader.read() || [];
+        let chat = "";
+        if (opts.length === 0)
+            return;
+        // console.log(opts);
+        for (let a in opts) {
+            chat += opts[a].text + " ";
+        }
+        if (chat.trim().match(/^\[\d{2}:\d{2}:\d{2}\]$/g))
+            return;
+        // console.log(chat);
+        const clueType2 = chat.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
+        if (((_a = clueType2 === null || clueType2 === void 0 ? void 0 : clueType2.groups) === null || _a === void 0 ? void 0 : _a.type) && clueType2.groups.type !== split.clueType) {
+            split.clueType = clueType2.groups.type;
+        }
+        const clueComplete = chat.match(settings.regex);
+        // TODO: Auto-stop Alt1 in-app timer if got reward but clue carrier didn't place new clue (last clue finished)
+        if (!(clueComplete != null && clueComplete.length > -1))
+            return;
+        console.log(clueComplete);
+        const timestamp = clueComplete[0].match(/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})/);
+        if (!(split.startTime !== 0 && timestamp != null && timestamp.length > -1))
+            return;
+        if (split.timestamps.has(timestamp[0])) {
+            return console.log("Duplicate timestamp");
+        }
+        const d = new Date();
+        const time = new Date(d.getFullYear(), d.getMonth(), d.getDate(), +timestamp.groups.hour, +timestamp.groups.minute, +timestamp.groups.second);
+        if (time.getTime() < split.startTime) {
+            return console.log("Clue too early");
+        }
+        const splitat = settings.settings.splitat;
+        if (split.actions % splitat === 0) {
+            console.log("SPLIT!");
+            split.split(timestamp[0]);
+        }
+        split.actions++;
+    }
+}
+//check if we are running inside alt1 by checking if the alt1 global exists
+if (window.alt1) {
+    //tell alt1 about the app
+    //this makes alt1 show the add app button when running inside the embedded browser
+    //also updates app settings if they are changed
+    alt1.identifyAppUrl("./appconfig.json");
+    if (!alt1.permissionPixel) {
+        a1Error.setError("Page is not installed as app or capture permission is not enabled");
+    }
+    _alt1_base__WEBPACK_IMPORTED_MODULE_0__.on("alt1pressed", (e) => {
+        var _a;
+        const clue = e.text.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
+        if ((_a = clue === null || clue === void 0 ? void 0 : clue.groups) === null || _a === void 0 ? void 0 : _a.type) {
+            split.clueType = clue.groups.type;
+            split.clear();
+            split.startTimer();
+        }
+    });
+}
+document.addEventListener("readystatechange", () => {
+    if (document.readyState === "complete") {
+        capture();
+    }
+}, false);
+if (settings.settings.livesplit !== false) {
+    window.webkitRequestFileSystem(window.TEMPORARY, 1024 * 1024, _scripts_FileUtil__WEBPACK_IMPORTED_MODULE_4__.onInitFs, _scripts_FileUtil__WEBPACK_IMPORTED_MODULE_4__.onError);
+}
+if (document.location.host !== "californ1a.github.io") {
+    (0,_scripts_TestBtn__WEBPACK_IMPORTED_MODULE_7__.addTestButton)();
+}
+
+
+/***/ }),
+
+/***/ "./scripts/Chat.ts":
+/*!*************************!*\
+  !*** ./scripts/Chat.ts ***!
+  \*************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "showSelectedChat": () => (/* binding */ showSelectedChat),
+/* harmony export */   "hexToRgb": () => (/* binding */ hexToRgb)
+/* harmony export */ });
+/* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
+
+function showSelectedChat(chat) {
+    const appColor = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(0, 255, 0);
+    //Attempt to show a temporary rectangle around the chatbox.  skip if overlay is not enabled.
+    try {
+        alt1.overLayRect(appColor, chat.rect.x, chat.rect.y, chat.rect.width, chat.rect.height, 2000, 5);
+    }
+    catch (e) {
+        console.error(e);
+    }
+}
+function hexToRgb(hex) {
+    return hex.match(/[A-Za-z0-9]{2}/g).map((v) => parseInt(v, 16));
+}
+
+
+/***/ }),
+
+/***/ "./scripts/FileUtil.ts":
+/*!*****************************!*\
+  !*** ./scripts/FileUtil.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "onError": () => (/* binding */ onError),
+/* harmony export */   "writeLine": () => (/* binding */ writeLine),
+/* harmony export */   "onInitFs": () => (/* binding */ onInitFs)
+/* harmony export */ });
+let fileSystem;
+function onError(e) {
+    console.error(e);
+}
+function writeLine(line) {
+    if (fileSystem && localStorage.getItem("livesplit") === "true") {
+        fileSystem.createWriter((fileWriter) => {
+            fileWriter.seek(fileWriter.length);
+            const blob = new Blob([`${line}\r\n`], { type: "text/plain" });
+            fileWriter.write(blob);
+        }, onError);
+    }
+}
+function truncate(fs) {
+    fs.createWriter((fileWriter) => {
+        fileWriter.truncate(0);
+    }, onError);
+}
+function setFile(fs) {
+    truncate(fs);
+    fileSystem = fs;
+}
+function onInitFs(fs) {
+    fs.root.getFile("info.txt", { create: false }, setFile, (e) => {
+        console.log("File does not exist, creating...");
+        fs.root.getFile("info.txt", { create: true }, setFile, onError);
+    });
+}
+
+
+/***/ }),
+
+/***/ "./scripts/Settings.ts":
+/*!*****************************!*\
+  !*** ./scripts/Settings.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Settings": () => (/* binding */ Settings)
+/* harmony export */ });
+/* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
+/* harmony import */ var _Chat__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Chat */ "./scripts/Chat.ts");
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../index */ "./index.ts");
+
+
+
+class Settings {
+    constructor(settingEles, settingsBtn, defaultBtn, chatDropdown, modal) {
+        var _a, _b, _c, _d, _e;
+        var _f, _g, _h, _j, _k;
+        this.settings = {
+            "timer-type": Settings.defaultValues["timer-type"],
+            "clueshr-type": Settings.defaultValues["clueshr-type"],
+            autostop: Settings.defaultValues.autostop,
+            splitat: Settings.defaultValues.splitat,
+            chat: Settings.defaultValues.chat,
+            livesplit: Settings.defaultValues.livesplit,
+            regex: Settings.defaultValues.regex,
+            color: Settings.defaultValues.color,
+        };
+        (_a = (_f = this.settings)["timer-type"]) !== null && _a !== void 0 ? _a : (_f["timer-type"] = localStorage.getItem("timer-type"));
+        (_b = (_g = this.settings)["clueshr-type"]) !== null && _b !== void 0 ? _b : (_g["clueshr-type"] = localStorage.getItem("clueshr-type"));
+        this.settings.autostop = parseInt(localStorage.getItem("autostop"), 10) || Settings.defaultValues.autostop;
+        this.settings.splitat = parseInt(localStorage.getItem("splitat"), 10) || Settings.defaultValues.splitat;
+        (_c = (_h = this.settings).chat) !== null && _c !== void 0 ? _c : (_h.chat = localStorage.getItem("chatId"));
+        this.settings.livesplit = (localStorage.getItem("livesplit") === "false") ? false : Settings.defaultValues.livesplit;
+        (_d = (_j = this.settings).regex) !== null && _d !== void 0 ? _d : (_j.regex = localStorage.getItem("regex"));
+        (_e = (_k = this.settings).color) !== null && _e !== void 0 ? _e : (_k.color = localStorage.getItem("color"));
+        this.regex = new RegExp(`${Settings.regexTimestampStr} ${this.settings.regex}`);
+        this.modal = modal;
+        this.settingElements = Array.from(settingEles).map((element) => element.children[0]);
+        this.saveLocalStorage(true);
+        settingsBtn.addEventListener("click", this.open.bind(this));
+        defaultBtn.addEventListener("click", this.resetToDefault.bind(this));
+        chatDropdown.addEventListener("change", (e) => {
+            const value = parseInt(e.target.value, 10) || parseInt(this.settings.chat, 10);
+            if (value && _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.boxes[value]) {
+                (0,_Chat__WEBPACK_IMPORTED_MODULE_1__.showSelectedChat)(_index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.boxes[value]);
+            }
+            else if (_index__WEBPACK_IMPORTED_MODULE_2__.reader.pos) {
+                (0,_Chat__WEBPACK_IMPORTED_MODULE_1__.showSelectedChat)(_index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.mainbox);
+            }
+        });
+    }
+    resetToDefault() {
+        localStorage.clear();
+        this.settings["timer-type"] = "overall";
+        this.settings["clueshr-type"] = "overall";
+        this.settings.autostop = 50;
+        this.settings.splitat = 1;
+        this.settings.chat = "";
+        this.settings.livesplit = true;
+        this.settings.regex = Settings.defaultRegexStr;
+        this.settings.color = "#00ff00";
+        this.regex = new RegExp(`${Settings.regexTimestampStr} ${Settings.defaultRegexStr}`);
+        this.saveLocalStorage();
+    }
+    saveLocalStorage(onlyUnset = false) {
+        for (const key in this.settings) {
+            if (!Object.prototype.hasOwnProperty.call(this.settings, key))
+                continue;
+            if (onlyUnset && localStorage.getItem(key) !== null)
+                continue;
+            localStorage.setItem(key, this.settings[key]);
+        }
+    }
+    saveElements() {
+        this.settingElements.forEach((element) => {
+            if (element.type === "checkbox") {
+                localStorage.setItem(element.id, element.checked.toString());
+                this.settings[element.id] = element.checked;
+            }
+            else {
+                localStorage.setItem(element.id, element.value);
+                this.settings[element.id] = element.value;
+            }
+        });
+    }
+    setElementValues() {
+        this.settingElements.forEach((element) => {
+            if (element.type === "checkbox") {
+                element.checked = this.settings[element.id];
+            }
+            else {
+                element.value = this.settings[element.id];
+            }
+        });
+    }
+    //TODO: move to chat utils
+    setChat(currentChat) {
+        var _a;
+        if (!_index__WEBPACK_IMPORTED_MODULE_2__.reader.pos)
+            return;
+        const chat = parseInt(currentChat, 10);
+        if (chat && ((_a = _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.boxes) === null || _a === void 0 ? void 0 : _a[chat])) {
+            const main = _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.mainbox;
+            const box = _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.boxes[chat];
+            if (main.rect.x !== box.rect.x || main.rect.y !== box.rect.y) { // not the same box
+                _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.mainbox = box;
+            }
+        }
+        else {
+            //If multiple boxes are found, this will select the first, which should be the top-most chat box on the screen.
+            _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.mainbox = _index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.boxes[0];
+        }
+        (0,_Chat__WEBPACK_IMPORTED_MODULE_1__.showSelectedChat)(_index__WEBPACK_IMPORTED_MODULE_2__.reader.pos.mainbox);
+    }
+    open() {
+        this.modal.style.display = "flex";
+        this.setElementValues();
+    }
+    close(split) {
+        for (const element of this.settingElements) {
+            // skip unchanged elements
+            if (element.type === "checkbox" && element.checked === this.settings[element.id])
+                continue;
+            if (element.value === this.settings[element.id])
+                continue;
+            if (element.id === "regex") {
+                this.regex = new RegExp(`${Settings.regexTimestampStr} ${element.value}`);
+            }
+            else if (element.id === "color") {
+                const c = (0,_Chat__WEBPACK_IMPORTED_MODULE_1__.hexToRgb)(element.value);
+                if (_index__WEBPACK_IMPORTED_MODULE_2__.reader) {
+                    _index__WEBPACK_IMPORTED_MODULE_2__.reader.readargs.colors[_index__WEBPACK_IMPORTED_MODULE_2__.reader.readargs.colors.length - 1] = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]);
+                }
+            }
+            else if (element.id === "clueshr-type") {
+                split.swapCluesHrType(element.value, this.settings.splitat);
+            }
+            else if (element.id === "chat") {
+                this.setChat(element.value);
+            }
+        }
+        this.saveElements();
+        this.modal.style.display = "none";
+    }
+}
+Settings.regexTimestampStr = "\\[\\d{2}:\\d{2}:\\d{2}\\]";
+Settings.defaultRegexStr = "Your (reward was stored in Charos|Charos Clue Carrier has placed)";
+Settings.defaultValues = {
+    "timer-type": "overall",
+    "clueshr-type": "overall",
+    autostop: 50,
+    splitat: 1,
+    chat: "",
+    livesplit: true,
+    regex: Settings.defaultRegexStr,
+    color: "#00ff00",
+};
+
+
+/***/ }),
+
+/***/ "./scripts/Splits.ts":
+/*!***************************!*\
+  !*** ./scripts/Splits.ts ***!
+  \***************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Splits": () => (/* binding */ Splits)
+/* harmony export */ });
+/* harmony import */ var _FileUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FileUtil */ "./scripts/FileUtil.ts");
+/* harmony import */ var _TimerUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TimerUtil */ "./scripts/TimerUtil.ts");
+
+
+class Splits {
+    constructor(startBtn, clearBtn, splitsEle, timerEle, scrollBox) {
+        this.splits = [];
+        this.timestamps = new Set();
+        this.startDate = new Date();
+        this.lastTime = this.startDate.getTime();
+        this.startTime = 0;
+        this.actions = 1;
+        this.clueType = "";
+        this.timerAnim = 0;
+        this.startBtn = startBtn;
+        this.clearBtn = clearBtn;
+        this.splitsEle = splitsEle;
+        this.timerEle = timerEle;
+        this.scrollBox = scrollBox;
+        this.startBtn.addEventListener("click", () => this.startTimer());
+        this.clearBtn.addEventListener("click", () => this.clear());
+    }
+    clear() {
+        this.startBtn.innerHTML = "Start";
+        cancelAnimationFrame(this.timerAnim);
+        this.startTime = 0;
+        this.startDate = new Date();
+        this.actions = 1;
+        this.splitsEle.innerHTML = "";
+        this.timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+        this.splits = [];
+        (0,_FileUtil__WEBPACK_IMPORTED_MODULE_0__.writeLine)("RESET");
+    }
+    split(ts) {
+        if (ts) {
+            this.timestamps.add(ts);
+        }
+        (0,_FileUtil__WEBPACK_IMPORTED_MODULE_0__.writeLine)(`SPLIT-${this.actions}`);
+        const currentTime = (new Date()).getTime();
+        const previous = this.splits[this.splits.length - 1] || this.startTime;
+        this.splits.push(currentTime);
+        const msDuration = currentTime - this.startTime;
+        const time = (0,_TimerUtil__WEBPACK_IMPORTED_MODULE_1__.formatTime)(msDuration);
+        const segMsDur = currentTime - previous;
+        const clueshrType = localStorage.getItem("clueshr-type") || "overall";
+        const splitper = localStorage.getItem("splitat") || "1";
+        const actionsPerTime = (clueshrType === "single") ? (+splitper) / segMsDur : this.actions / msDuration;
+        const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
+        const segmentTime = (previous) ? (0,_TimerUtil__WEBPACK_IMPORTED_MODULE_1__.formatTime)(segMsDur) : time;
+        this.splitsEle.innerHTML += `<tr>
+			<td>${this.actions}</td>
+			<td>${segmentTime}</td>
+			<td>${time}</td>
+			<td>${cluesHr}.<span class="miliseconds">${(chrMs) ? chrMs : "00"}</span></td>
+		</tr>`;
+        this.scrollBox.scrollTo({
+            top: this.scrollBox.scrollHeight,
+            behavior: "smooth"
+        });
+        const as = localStorage.getItem("autostop");
+        if (!(as !== "" || as !== null))
+            return;
+        if (!(as !== "0" && as === this.actions.toString()))
+            return;
+        this.startTimer();
+    }
+    startTimer() {
+        if (this.startTime !== 0) {
+            clearInterval(this.chatboxInterval);
+            this.startBtn.innerHTML = "Start";
+            cancelAnimationFrame(this.timerAnim);
+            this.startTime = 0;
+            //timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
+            return;
+        }
+        this.clear();
+        (0,_FileUtil__WEBPACK_IMPORTED_MODULE_0__.writeLine)("START");
+        this.startBtn.innerHTML = "Stop";
+        this.startDate = new Date();
+        this.startTime = this.startDate.getTime();
+        requestAnimationFrame(this.runTimer.bind(this));
+    }
+    runTimer() {
+        const currentTime = (new Date()).getTime();
+        if (currentTime - this.lastTime >= 50) {
+            this.lastTime = currentTime;
+            // numSeconds++;
+            // timerEle.innerHTML = `${numSeconds}`;
+            if (localStorage.getItem("timer-type") === "single") {
+                const previous = this.splits[this.splits.length - 1] || this.startTime;
+                (0,_TimerUtil__WEBPACK_IMPORTED_MODULE_1__.showTime)(this.timerEle, currentTime - previous);
+            }
+            else {
+                (0,_TimerUtil__WEBPACK_IMPORTED_MODULE_1__.showTime)(this.timerEle, currentTime - this.startTime);
+            }
+        }
+        this.timerAnim = requestAnimationFrame(this.runTimer.bind(this));
+    }
+    setcbInterval(cbInterval) {
+        this.chatboxInterval = cbInterval;
+    }
+    swapCluesHrType(cluesHrType, splitat) {
+        const rows = this.splitsEle.children;
+        for (let i = 0; i < rows.length; i++) {
+            const clueshrTd = rows[i].children[3];
+            const msDuration = this.splits[i] - this.startTime;
+            const segMsDur = (i === 0) ? this.splits[i] - this.startTime : this.splits[i] - this.splits[i - 1];
+            const actionsPerTime = (cluesHrType === "single") ? splitat / segMsDur : this.actions / msDuration;
+            const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
+            clueshrTd.innerHTML = `${cluesHr}.<span class="miliseconds">${(chrMs) ? chrMs : "00"}</span>`;
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./scripts/TestBtn.ts":
+/*!****************************!*\
+  !*** ./scripts/TestBtn.ts ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "addTestButton": () => (/* binding */ addTestButton)
+/* harmony export */ });
+/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../index */ "./index.ts");
+
+function addTestButton() {
+    const testBtn = document.querySelector(".test");
+    if (testBtn) {
+        return console.log("Test button already exists");
+    }
+    const th = document.createElement("th");
+    th.innerHTML = "<div class=\"nisbutton2 test\">Test</div>";
+    document.querySelector(".menu tr").appendChild(th);
+    th.children[0].addEventListener("click", test);
+}
+function test() {
+    if (!_index__WEBPACK_IMPORTED_MODULE_0__.split.startTime) {
+        _index__WEBPACK_IMPORTED_MODULE_0__.split.startTimer();
+        return;
+    }
+    _index__WEBPACK_IMPORTED_MODULE_0__.split.split();
+    _index__WEBPACK_IMPORTED_MODULE_0__.split.actions++;
+}
+
+
+/***/ }),
+
+/***/ "./scripts/TimerUtil.ts":
+/*!******************************!*\
+  !*** ./scripts/TimerUtil.ts ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "formatTime": () => (/* binding */ formatTime),
+/* harmony export */   "showTime": () => (/* binding */ showTime),
+/* harmony export */   "A1Error": () => (/* binding */ A1Error)
+/* harmony export */ });
+function formatTime(value) {
+    const seconds = (value / 1000) % 60;
+    const minutes = Math.floor((value / (60 * 1000)) % 60);
+    const hours = Math.floor((value / (60 * 60 * 1000)) % 24);
+    const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
+    const [sec, mil] = secondsS.split(".");
+    const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
+    const hoursS = `${hours}`.slice(-2);
+    if (hours < 1 && minutes < 1) {
+        return `${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
+    }
+    if (hours < 1) {
+        return `${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
+    }
+    return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
+}
+function showTime(timerEle, value) {
+    timerEle.innerHTML = formatTime(value);
+}
+class A1Error {
+    constructor(errorEle, timerEle) {
+        this.name = "A1Error";
+        this.errorEle = errorEle;
+        this.timerEle = timerEle;
+    }
+    setError(message) {
+        var _a, _b;
+        if (!this.errorEle) {
+            this.errorEle = document.createElement("span");
+            this.errorEle.className = "error";
+            this.timerEle.append(this.errorEle);
+        }
+        this.errorEle.style.display = "block";
+        this.errorEle.ariaLabel = message;
+        if (!window.alt1 || !((_a = window.alt1) === null || _a === void 0 ? void 0 : _a.permissionPixel) || !((_b = window.alt1) === null || _b === void 0 ? void 0 : _b.permissionOverlay)) {
+            this.errorEle.title = message;
+        }
+    }
+    clearError() {
+        if (!this.errorEle)
+            return;
+        this.errorEle.style.display = "none";
+        this.errorEle.ariaLabel = "";
+        if (!window.alt1) {
+            this.errorEle.title = "";
+        }
+        else {
+            alt1.clearTooltip();
+        }
+    }
+}
+
+
 /***/ })
 
 /******/ 	});
@@ -4284,545 +4962,12 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-/*!******************!*\
-  !*** ./index.ts ***!
-  \******************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "addTestButton": () => (/* binding */ addTestButton)
-/* harmony export */ });
-/* harmony import */ var _alt1_base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @alt1/base */ "../node_modules/@alt1/base/dist/index.js");
-/* harmony import */ var _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @alt1/chatbox */ "../node_modules/@alt1/chatbox/dist/index.js");
-//alt1 base libs, provides all the commonly used methods for image matching and capture
-//also gives your editor info about the window.alt1 api
-
-
-//tell webpack to add index.html and appconfig.json to output
-__webpack_require__(/*! !file-loader?name=[name].[ext]!./index.html */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./index.html");
-__webpack_require__(/*! !file-loader?name=[name].[ext]!./style.css */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./style.css");
-__webpack_require__(/*! !file-loader?name=[name].[ext]!./appconfig.json */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./appconfig.json");
-__webpack_require__(/*! !file-loader?name=[name].[ext]!./settingsbutton2.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./settingsbutton2.png");
-__webpack_require__(/*! !file-loader?name=[name].[ext]!./Icon.png */ "../node_modules/file-loader/dist/cjs.js?name=[name].[ext]!./Icon.png");
-// const output = document.querySelector(".main");
-const startBtn = document.querySelector(".nisbutton.start");
-startBtn.addEventListener("click", startTimer);
-const clearBtn = document.querySelector(".nisbutton.clear");
-clearBtn.addEventListener("click", clear);
-const settingsBtn = document.querySelector(".nissmallimagebutton.settings");
-settingsBtn.addEventListener("click", openSettings);
-const modal = document.getElementById("settingsModal");
-const modalCloseBtn = document.getElementsByClassName("nisclosebutton")[0];
-const timerEle = document.querySelector(".timer .time");
-const splitsEle = document.querySelector(".splits");
-const scrollBox = document.querySelector(".second");
-const defaultButton = document.querySelector(".default");
-let errorEle = document.querySelector(".error");
-const regexTimestampStr = "\\[\\d{2}:\\d{2}:\\d{2}\\]";
-const regexStr = "Your (reward was stored in Charos|Charos Clue Carrier has placed)";
-let regex = new RegExp(`${regexTimestampStr} ${regexStr}`);
-let chatboxInterval;
-let timerAnim;
-let splits = [];
-let lastTime = (new Date()).getTime();
-let startTime = 0;
-let startDate = new Date();
-let file;
-let actions = 1;
-let reader;
-let clueType = "";
-function closeSettings() {
-    const settingsElements = document.querySelectorAll(".modal-content td:nth-child(even)");
-    for (const { children: [setting] } of settingsElements) {
-        // console.log(setting.id, setting.value);
-        if (setting.id === "regex") {
-            regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
-        }
-        else if (setting.id === "chat" && reader && reader.pos) {
-            const chat = setting.value;
-            const ls = localStorage.getItem("chat");
-            if (chat !== null && chat !== "") {
-                const main = reader.pos.mainbox;
-                const box = JSON.parse(atob(chat));
-                if (main.rect.x !== box.rect.x || main.rect.y !== box.rect.y) { // not the same box
-                    reader.pos.mainbox = box;
-                }
-            }
-            else if (ls !== "" && ls !== null) {
-                reader.pos.mainbox = JSON.parse(atob(ls));
-            }
-            else {
-                //If multiple boxes are found, this will select the first, which should be the top-most chat box on the screen.
-                reader.pos.mainbox = reader.pos.boxes[0];
-            }
-            showSelectedChat(reader.pos.mainbox);
-        }
-        else if (setting.id === "color") {
-            const c = hexToRgb(setting.value);
-            if (reader) {
-                reader.readargs.colors[reader.readargs.colors.length - 1] = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]);
-            }
-        }
-        else if (setting.id === "clueshr-type") {
-            const ls = localStorage.getItem("clueshr-type");
-            if (ls !== null && ls !== "" && setting.value !== ls && splitsEle.children) {
-                const rows = splitsEle.children;
-                for (let i = 0; i < rows.length; i++) {
-                    const clueshrTd = rows[i].children[3];
-                    const msDuration = splits[i] - startTime;
-                    const segMsDur = (i === 0) ? splits[i] - startTime : splits[i] - splits[i - 1];
-                    const splitper = localStorage.getItem("splitat") || "1";
-                    const actionsPerTime = (setting.value === "single") ? (+splitper) / segMsDur : actions / msDuration;
-                    const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
-                    clueshrTd.innerHTML = `${cluesHr}.<span class="miliseconds">${(chrMs) ? chrMs : "00"}</span>`;
-                }
-            }
-        }
-        if (setting.type === "checkbox") {
-            localStorage.setItem(setting.id, setting.checked);
-        }
-        else {
-            localStorage.setItem(setting.id, setting.value);
-        }
-    }
-    modal.style.display = "none";
-}
-defaultButton.addEventListener("click", () => {
-    localStorage.clear();
-    const settingsElements = document.querySelectorAll(".modal-content td:nth-child(even)");
-    for (const { children: [setting] } of settingsElements) {
-        if (setting.id === "regex") {
-            setting.value = regexStr;
-            regex = new RegExp(`${regexTimestampStr} ${setting.value}`);
-        }
-        else if (setting.id === "chat") {
-            setting.value = "";
-            if (reader && reader.pos) {
-                reader.pos.mainbox = reader.pos.boxes[0];
-                showSelectedChat(reader.pos.mainbox);
-            }
-        }
-        else if (setting.id === "livesplit") {
-            setting.checked = true;
-            localStorage.setItem("livesplit", "true");
-        }
-        else if (setting.id === "timer-type") {
-            setting.value = "overall";
-            localStorage.setItem("timer-type", "overall");
-        }
-        else if (setting.id === "clueshr-type") {
-            setting.value = "overall";
-            localStorage.setItem("clueshr-type", "overall");
-        }
-        else if (setting.id === "autostop") {
-            setting.value = "50";
-            localStorage.setItem("autostop", "50");
-        }
-        else if (setting.id === "splitat") {
-            setting.value = "1";
-            localStorage.setItem("splitat", "1");
-        }
-        else if (setting.id === "color") {
-            setting.value = "#00ff00";
-            localStorage.setItem("color", "#00ff00");
-        }
-    }
-});
-modalCloseBtn.addEventListener("click", () => {
-    closeSettings();
-});
-window.addEventListener("click", (event) => {
-    if (event.target == modal) {
-        closeSettings();
-    }
-});
-errorEle.addEventListener("mouseenter", () => {
-    if (errorEle.title)
-        return;
-    alt1.setTooltip(errorEle.ariaLabel);
-});
-errorEle.addEventListener("mouseleave", () => {
-    if (errorEle.title)
-        return;
-    alt1.clearTooltip();
-});
-document.querySelector("#chat").addEventListener("change", (e) => {
-    const value = e.target.value || localStorage.getItem("chat");
-    if (value) {
-        showSelectedChat(JSON.parse(atob(e.target.value)));
-    }
-    else {
-        showSelectedChat(reader.pos.mainbox);
-    }
-});
-function setValue(id, value) {
-    const setting = document.querySelector(`#${id}`);
-    const ls = localStorage.getItem(id);
-    if (ls === null || ls === "") {
-        setting.value = value;
-    }
-    else {
-        setting.value = ls;
-    }
-}
-function openSettings() {
-    modal.style.display = "flex";
-    const regexEle = document.querySelector("textarea#regex");
-    if (!regexEle.value) {
-        regexEle.value = regexStr;
-    }
-    const livesplitEle = document.querySelector("#livesplit");
-    const ls = localStorage.getItem("livesplit");
-    if (ls === null || ls === "") {
-        livesplitEle.checked = true;
-    }
-    else if (ls === "false") {
-        livesplitEle.checked = false;
-    }
-    else {
-        livesplitEle.checked = true;
-    }
-    setValue("timer-type", "overall");
-    setValue("clueshr-type", "overall");
-    setValue("autostop", "50");
-    setValue("splitat", "1");
-    setValue("color", "#00ff00");
-}
-function setError(message) {
-    var _a, _b;
-    if (!errorEle) {
-        errorEle = document.createElement("span");
-        errorEle.className = "error";
-        timerEle.append(errorEle);
-    }
-    errorEle.style.display = "block";
-    errorEle.ariaLabel = message;
-    if (!window.alt1 || !((_a = window.alt1) === null || _a === void 0 ? void 0 : _a.permissionPixel) || !((_b = window.alt1) === null || _b === void 0 ? void 0 : _b.permissionOverlay)) {
-        errorEle.title = message;
-    }
-}
-function clearError() {
-    if (!errorEle)
-        return;
-    errorEle.style.display = "none";
-    errorEle.ariaLabel = "";
-    if (!window.alt1) {
-        errorEle.title = "";
-    }
-    else {
-        alt1.clearTooltip();
-    }
-}
-function onError(e) {
-    console.error(e);
-}
-function clear() {
-    startBtn.innerHTML = "Start";
-    cancelAnimationFrame(timerAnim);
-    startTime = 0;
-    startDate = new Date();
-    actions = 1;
-    splitsEle.innerHTML = "";
-    timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
-    splits = [];
-    writeLine("RESET");
-}
-function formatTime(value) {
-    const seconds = (value / 1000) % 60;
-    const minutes = Math.floor((value / (60 * 1000)) % 60);
-    const hours = Math.floor((value / (60 * 60 * 1000)) % 24);
-    const secondsS = (seconds < 10 && (minutes >= 1 || hours >= 1)) ? `0${seconds}`.slice(0, 5) : `${seconds.toFixed(2)}`;
-    const [sec, mil] = secondsS.split(".");
-    const minutesS = (minutes < 10 && hours >= 1) ? `0${minutes}`.slice(-2) : `${minutes}`.slice(-2);
-    const hoursS = `${hours}`.slice(-2);
-    if (hours < 1 && minutes < 1) {
-        return `${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
-    }
-    if (hours < 1) {
-        return `${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
-    }
-    return `${hoursS}:${minutesS}:${sec}.<span class="miliseconds">${(mil) ? mil : "00"}</span>`;
-}
-function showTime(value) {
-    timerEle.innerHTML = formatTime(value);
-}
-function timer() {
-    const currentTime = (new Date()).getTime();
-    if (currentTime - lastTime >= 50) {
-        lastTime = currentTime;
-        // numSeconds++;
-        // timerEle.innerHTML = `${numSeconds}`;
-        if (localStorage.getItem("timer-type") === "single") {
-            const previous = splits[splits.length - 1] || startTime;
-            showTime(currentTime - previous);
-        }
-        else {
-            showTime(currentTime - startTime);
-        }
-    }
-    timerAnim = requestAnimationFrame(timer);
-}
-function split() {
-    writeLine(`SPLIT-${actions}`);
-    const currentTime = (new Date()).getTime();
-    const previous = splits[splits.length - 1] || startTime;
-    splits.push(currentTime);
-    const msDuration = currentTime - startTime;
-    const time = formatTime(msDuration);
-    const segMsDur = currentTime - previous;
-    const clueshrType = localStorage.getItem("clueshr-type") || "overall";
-    const splitper = localStorage.getItem("splitat") || "1";
-    const actionsPerTime = (clueshrType === "single") ? (+splitper) / segMsDur : actions / msDuration;
-    const [cluesHr, chrMs] = `${(actionsPerTime * (60 * 60 * 1000)).toFixed(2)}`.split(".");
-    const segmentTime = (previous) ? formatTime(segMsDur) : time;
-    splitsEle.innerHTML += `<tr>
-		<td>${actions}</td>
-		<td>${segmentTime}</td>
-		<td>${time}</td>
-		<td>${cluesHr}.<span class="miliseconds">${(chrMs) ? chrMs : "00"}</span></td>
-	</tr>`;
-    scrollBox.scrollTo({
-        top: scrollBox.scrollHeight,
-        behavior: "smooth"
-    });
-    const as = localStorage.getItem("autostop");
-    if (as !== "" || as !== null) {
-        if (as !== "0" && as === actions.toString()) {
-            startTimer();
-        }
-    }
-}
-function writeLine(line) {
-    if (file && localStorage.getItem("livesplit") === "true") {
-        file.createWriter((fileWriter) => {
-            fileWriter.seek(fileWriter.length);
-            const blob = new Blob([`${line}\r\n`], { type: "text/plain" });
-            fileWriter.write(blob);
-        }, onError);
-    }
-}
-function startTimer() {
-    if (startTime !== 0) {
-        clearInterval(chatboxInterval);
-        startBtn.innerHTML = "Start";
-        cancelAnimationFrame(timerAnim);
-        startTime = 0;
-        //timerEle.innerHTML = "0.<span class=\"miliseconds\">00</span>";
-        return;
-    }
-    clear();
-    writeLine("START");
-    startBtn.innerHTML = "Stop";
-    startDate = new Date();
-    startTime = startDate.getTime();
-    requestAnimationFrame(timer);
-}
-function showSelectedChat(chat) {
-    const appColor = _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(0, 255, 0);
-    //Attempt to show a temporary rectangle around the chatbox.  skip if overlay is not enabled.
-    try {
-        alt1.overLayRect(appColor, chat.rect.x, chat.rect.y, chat.rect.width, chat.rect.height, 2000, 5);
-    }
-    catch (e) {
-        console.error(e);
-    }
-}
-function capture() {
-    if (!window.alt1) {
-        setError("You need to run this page in alt1 to capture the screen");
-        return;
-    }
-    if (!alt1.permissionPixel) {
-        setError("Page is not installed as app or capture permission is not enabled");
-        return;
-    }
-    reader = new _alt1_chatbox__WEBPACK_IMPORTED_MODULE_1__["default"]();
-    let c = localStorage.getItem("color");
-    if (c) {
-        c = hexToRgb(c);
-    }
-    else {
-        c = [0, 255, 0];
-    }
-    reader.readargs = {
-        colors: [
-            _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(255, 255, 255),
-            _alt1_base__WEBPACK_IMPORTED_MODULE_0__.mixColor(c[0], c[1], c[2]), //green
-            //A1lib.mixColor(255, 165, 0), //Scavenging comps
-            //A1lib.mixColor(255, 0, 0), //Rare Mats
-            //A1lib.mixColor(67, 188, 188), //Ancient components
-        ],
-    };
-    try {
-        reader.find(); //Find the chat box.
-        reader.read(); //Get the initial read, to not report on initial load.
-    }
-    catch (e) {
-        console.error(e);
-        setError("Failed to capture RS");
-        return;
-    }
-    //Find all visible chatboxes on screen
-    // reader.find();
-    // reader.read();
-    let findChat = setInterval(() => {
-        if (reader.pos === null) {
-            setError("Looking for chatbox");
-            reader.find();
-        }
-        else {
-            clearInterval(findChat);
-            clearError();
-            reader.pos.boxes.map((box, i) => {
-                const chat = document.querySelector("#chat");
-                const value = btoa(JSON.stringify(box));
-                chat.innerHTML += `<option value=${value}>Chat ${i}</option>`;
-            });
-            const chat = localStorage.getItem("chat");
-            if (chat !== null && chat !== "") {
-                reader.pos.mainbox = reader.pos.boxes[+chat];
-            }
-            else {
-                //If multiple boxes are found, this will select the first, which should be the top-most chat box on the screen.
-                reader.pos.mainbox = reader.pos.boxes[0];
-            }
-            // console.log(reader);
-            showSelectedChat(reader.pos.mainbox);
-            chatboxInterval = setInterval(() => {
-                readChatbox();
-            }, 500);
-        }
-    }, 1000);
-    let timestamps = new Set();
-    function readChatbox() {
-        var _a;
-        const opts = reader.read() || [];
-        let chat = "";
-        if (opts.length === 0)
-            return;
-        // console.log(opts);
-        for (let a in opts) {
-            chat += opts[a].text + " ";
-        }
-        if (chat.trim().match(/^\[\d{2}:\d{2}:\d{2}\]$/g))
-            return;
-        // console.log(chat);
-        const clueType2 = chat.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
-        if (((_a = clueType2 === null || clueType2 === void 0 ? void 0 : clueType2.groups) === null || _a === void 0 ? void 0 : _a.type) && clueType2.groups.type !== clueType) {
-            clueType = clueType2.groups.type;
-        }
-        const clueComplete = chat.match(regex);
-        // TODO: Auto-stop Alt1 in-app timer if got reward but clue carrier didn't place new clue (last clue finished)
-        if (!(clueComplete != null && clueComplete.length > -1))
-            return;
-        console.log(clueComplete);
-        const timestamp = clueComplete[0].match(/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})/);
-        if (!(startTime !== 0 && timestamp != null && timestamp.length > -1))
-            return;
-        if (timestamps.has(timestamp[0])) {
-            return console.log("Duplicate timestamp");
-        }
-        const time = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), +timestamp.groups.hour, +timestamp.groups.minute, +timestamp.groups.second);
-        if (time.getTime() < startTime) {
-            return console.log("Clue too early");
-        }
-        const ls = localStorage.getItem("splitat") || "1";
-        if (actions % parseInt(ls, 10) === 0) {
-            timestamps.add(timestamp[0]);
-            console.log("SPLIT!");
-            split();
-        }
-        actions++;
-    }
-}
-function truncate(fs) {
-    fs.createWriter((fileWriter) => {
-        fileWriter.truncate(0);
-    }, onError);
-}
-function setFile(fs) {
-    truncate(fs);
-    file = fs;
-}
-function onInitFs(fs) {
-    fs.root.getFile("info.txt", { create: false }, setFile, (e) => {
-        console.log("File does not exist, creating...");
-        fs.root.getFile("info.txt", { create: true }, setFile, onError);
-    });
-}
-if (localStorage.getItem("livesplit") !== "false") {
-    window.webkitRequestFileSystem(window.TEMPORARY, 1024 * 1024, onInitFs, onError);
-}
-function hexToRgb(hex) {
-    return hex.match(/[A-Za-z0-9]{2}/g).map((v) => parseInt(v, 16));
-}
-//check if we are running inside alt1 by checking if the alt1 global exists
-if (window.alt1) {
-    //tell alt1 about the app
-    //this makes alt1 show the add app button when running inside the embedded browser
-    //also updates app settings if they are changed
-    alt1.identifyAppUrl("./appconfig.json");
-    if (!alt1.permissionPixel) {
-        setError("Page is not installed as app or capture permission is not enabled");
-    }
-    _alt1_base__WEBPACK_IMPORTED_MODULE_0__.on("alt1pressed", (e) => {
-        var _a;
-        const clue = e.text.match(/Sealed clue scroll \((?<type>.{4,6})\)/);
-        if ((_a = clue === null || clue === void 0 ? void 0 : clue.groups) === null || _a === void 0 ? void 0 : _a.type) {
-            clueType = clue.groups.type;
-            clear();
-            startTimer();
-        }
-    });
-}
-document.addEventListener("readystatechange", () => {
-    if (document.readyState === "complete") {
-        const ls = localStorage.getItem("livesplit");
-        if (ls === "" || ls === null) {
-            localStorage.setItem("livesplit", "true");
-        }
-        const color = localStorage.getItem("color");
-        if (color === "" || color === null) {
-            localStorage.setItem("color", "#00ff00");
-        }
-        const autostop = localStorage.getItem("autostop");
-        if (autostop === "" || autostop === null) {
-            localStorage.setItem("autostop", "50");
-        }
-        const splitat = localStorage.getItem("splitat");
-        if (splitat === "" || splitat === null) {
-            localStorage.setItem("splitat", "1");
-        }
-        capture();
-    }
-}, false);
-function addTestButton() {
-    const testBtn = document.querySelector(".test");
-    if (testBtn) {
-        return console.log("Test button already exists");
-    }
-    const th = document.createElement("th");
-    th.innerHTML = "<div class=\"nisbutton2 test\">Test</div>";
-    document.querySelector(".menu tr").appendChild(th);
-    th.children[0].addEventListener("click", test);
-}
-if (document.location.host !== "californ1a.github.io") {
-    addTestButton();
-}
-function test() {
-    if (!startTime) {
-        startTimer();
-        return;
-    }
-    split();
-    actions++;
-}
-
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./index.ts");
+/******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
