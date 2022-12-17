@@ -151,10 +151,11 @@ function capture() {
 			return console.log("Duplicate timestamp");
 		}
 
+		const d = new Date();
 		const time = new Date(
-			split.startDate.getFullYear(),
-			split.startDate.getMonth(),
-			split.startDate.getDate(),
+			d.getFullYear(),
+			d.getMonth(),
+			d.getDate(),
 			+timestamp.groups.hour,
 			+timestamp.groups.minute,
 			+timestamp.groups.second
