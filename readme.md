@@ -5,7 +5,7 @@
 	<img src="https://i.imgur.com/SDw2wzP.png"/>
 </p>
 
-Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank. Originally created for LiveSplit integration with Alt1 app UI added later on for independent usage without LS.
+Built on [alt1minimal](https://github.com/skillbert/alt1minimal/) using jank. Originally created for [LiveSplit](https://livesplit.org/) integration with Alt1 app UI added later on for independent usage without LS.
 
 </div>
 
@@ -19,8 +19,28 @@ To add to alt1, copy paste this full address:
 
 Then hit the `Add App` button and open the newly added app.
 
-### LiveSplit Integration
+## Usage
 
+Upon opening the app, your chatbox should be highlighted to show that it is now watching for clue scroll solve messages.
+
+Make sure you have timestamps enabled in your in-game chat. The app uses timestamps to make sure it doesn't split twice for the same clue. This can be done in the Settings under *Chat & Social* -> *Chat Customisation* -> *[Local timestamps in chat box](https://i.imgur.com/Tbry2Rp.png)*.
+
+<details>
+  <summary>(Old) <s>Node.js middleman</s></summary>
+  
+  If using the old Node.js middleman script, you will need to:
+
+  1. Open LiveSplit, right-click it, go to `Control`, and hit `Start Server`.
+  2. Open the console, browse to the middleman script repo folder, and run `npm start`. It should say `Connected!`
+</details>
+
+Right-click on your sealed clue, hover open the `Open` option, and hit alt+1 keybind to start the timer (both the in-app timer and the LiveSplit integration). Alternatively, click the `Start` button in the app which will do the same.
+
+By default, the in-app timer will auto-stop after 50 clues, this can be changed in the settings. If the auto-stop is set to 0, it will not auto-end at all, even if the Clue Carrier runs out of clues, so the `Stop` button can be used to stop the timer without clearing the times. The `Clear` button will reset both the in-app times and LiveSplit.
+
+## LiveSplit Integration
+
+### Setup
 To use with [LiveSplit](https://livesplit.org/):
 
 1. Download the [autosplitter.asl](https://raw.githubusercontent.com/Californ1a/alt1-jank-autosplitter/main/autosplitter.asl) file (Right-click -> Save As).
@@ -34,40 +54,31 @@ To use with [LiveSplit](https://livesplit.org/):
 
 The autosplitter script hooks into Alt1's process rather than RuneScape's. Make sure Alt1 is running prior to opening LiveSplit in order for the autosplitter to find Alt1's process.
 
-#### (Old) Node.js middleman
+<details>
+  <summary><h4>(Old) <s>Node.js middleman</s></h4></summary>
 
-> No longer required. Preferred method is using the autosplitter.asl now as outlined in the [LiveSplit Integration](https://github.com/Californ1a/alt1-jank-autosplitter#livesplit-integration) section.
+  > No longer required. Preferred method is using the autosplitter.asl now as outlined in the [LiveSplit Integration](https://github.com/Californ1a/alt1-jank-autosplitter#livesplit-integration) section.
 
-The original implementation of this app used a Node.js middleman script (found on [@Californ1a/jank-autosplitter](https://github.com/Californ1a/jank-autosplitter)) which relied on [LiveSplit Server](https://github.com/LiveSplit/LiveSplit.Server). This implementation can still be used if preferred rather than the autosplitter script.
+  The original implementation of this app used a Node.js middleman script (found on [@Californ1a/jank-autosplitter](https://github.com/Californ1a/jank-autosplitter)) which relied on [LiveSplit Server](https://github.com/LiveSplit/LiveSplit.Server). This implementation can still be used if preferred rather than the autosplitter script.
 
-To use the middleman script:
+  To use the middleman script:
 
-1. Install [Node.js](https://nodejs.org/en/) (preferrably using [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) or [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) rather than a direct install).
-1. Download [Livesplit Server](https://github.com/LiveSplit/LiveSplit.Server/releases) zip, and unzip it into the `Components` folder of your Livesplit install directory.
-2. Start Livesplit, right-click, edit layout, click the + button and add the Livesplit Server component (under the `Control` section).
-3. Clone the middleman script repo [@Californ1a/jank-autosplitter](https://github.com/Californ1a/jank-autosplitter)
-4. Open the console and run `npm i` in that repo's folder.
-5. Rename the `.env.sample` file to `.env` and edit it to change the `USERNAME` to match your Windows user name.
-   * You may also need to edit the rest of the file path, depending on if you have any other alt1 apps using this type of file storage. The `C:/Users/USERNAME/AppData/Local/Alt1Toolkit/chromecache/File System/` portion should be the same for most people, but the next folder (`/000/`) might be `/001/` or `/002/` (etc.) if there are other alt1 apps using file storage, though I don't believe there are.
+  1. Install [Node.js](https://nodejs.org/en/) (preferrably using [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) or [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) rather than a direct install).
+  2. Download [Livesplit Server](https://github.com/LiveSplit/LiveSplit.Server/releases) zip, and unzip it into the `Components` folder of your Livesplit install directory.
+  3. Start Livesplit, right-click, edit layout, click the + button and add the Livesplit Server component (under the `Control` section).
+  4. Clone the middleman script repo [@Californ1a/jank-autosplitter](https://github.com/Californ1a/jank-autosplitter)
+  5. Open the console and run `npm i` in that repo's folder.
+  6. Rename the `.env.sample` file to `.env` and edit it to change the `USERNAME` to match your Windows user name.
+     * You may also need to edit the rest of the file path, depending on if you have any other alt1 apps using this type of file storage. The `C:/Users/USERNAME/AppData/Local/Alt1Toolkit/chromecache/File System/` portion should be the same for most people, but the next folder (`/000/`) might be `/001/` or `/002/` (etc.) if there are other alt1 apps using file storage, though I don't believe there are.
+</details>
 
-## Usage
+### Usage
 
-Upon opening the app, your chatbox should be highlighted to show that it is now watching for clue scroll solve messages.
+Follow the same info from the main Usage section. Additional details about the usage of the LiveSplit integration:
 
-Make sure you have timestamps enabled in your in-game chat. The app uses timestamps to make sure it doesn't split twice for the same clue. This can be done in the Settings under *Chat & Social* -> *Chat Customisation* -> *[Local timestamps in chat box](https://i.imgur.com/Tbry2Rp.png)*.
+You can minimize the app and leave it running if you want to just use LiveSplit without the Alt1 app's UI window.
 
-You can minimize the app and leave it running if you want to just use LiveSplit, or run just the app on its own without LiveSplit if you want.
-
-If you're using the LiveSplit integration, open Livesplit and it should be ready to go after following the setup in the [LiveSplit Integration](https://github.com/Californ1a/alt1-jank-autosplitter#livesplit-integration) section once.
-
-If using the old Node.js middleman script, you will need to:
-
-1. Open LiveSplit, right-click it, go to `Control`, and hit `Start Server`.
-2. Open the console, browse to the middleman script repo folder, and run `npm start`. It should say `Connected!`
-
-Right-click on your sealed clue, hover open the `Open` option, and hit alt+1 keybind to start the timer (both the in-app timer and the LiveSplit integration). Alternatively, click the `Start` button in the app which will do the same.
-
-The in-app timer will not auto-end on your final split like LiveSplit will, so the `Stop` button can be used to stop the timer without clearing the times if you're using the in-app timer. The `Clear` button will reset both the in-app times and LiveSplit.
+When using the LiveSplit integration, you should just be able to open LiveSplit and load your splits file, then it should be ready to go after following the setup in the [LiveSplit Integration](https://github.com/Californ1a/alt1-jank-autosplitter#livesplit-integration) section above.
 
 ## Development Installation
 
